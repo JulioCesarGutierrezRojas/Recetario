@@ -21,7 +21,7 @@ class Ingredient(models.Model):
 
 class Recipe_Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_ingredients')
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='recipe_ingredients')
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.PROTECT, related_name='recipe_ingredients')
     quantity = models.DecimalField(decimal_places=2, max_digits=6)
 
     class Meta:
