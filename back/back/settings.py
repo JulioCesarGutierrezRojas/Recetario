@@ -44,12 +44,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'authorization',
+    'users',
+    'recipes',
+    'comments',
+    'ratings'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -146,4 +154,15 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60)
 }
 
+AUTH_USER_MODEL = 'users.User'
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
+# Solo para desarrollo
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Permitir dominios específicos (solo para producción)
+# CORS_ALLOWED_ORIGINS = []
+
+# Permitir credenciales (cookies, authorization)
+CORS_ALLOW_CREDENTIALS = True
