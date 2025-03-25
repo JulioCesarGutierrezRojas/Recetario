@@ -1,4 +1,3 @@
-import Navbar from "../../../components/Navbar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
@@ -30,21 +29,20 @@ const Home = () => {
 
     return (
         <>
-            <Navbar />
-            
+                        
             <div className="container-fluid d-flex flex-column align-items-center">
                 <div id="carouselExampleInterval" className="carousel slide w-100" data-bs-ride="carousel">
                     <div className="carousel-inner">
                         <div className="carousel-item active shadow-sm" data-bs-interval="3000">
-                            <img src="https://th.bing.com/th/id/R.31e94b490b92dc5377f4eb3a48976fd2?rik=tuUttqrX6EfH3w&pid=ImgRaw&r=0" className="img-fluid w-100" style={{ height: "250px", objectFit: "cover" }} />
+                            <img src="https://th.bing.com/th/id/R.31e94b490b92dc5377f4eb3a48976fd2?rik=tuUttqrX6EfH3w&pid=ImgRaw&r=0" className="img-fluid w-100" style={{ height: "350px", objectFit: "cover" }} />
                         </div>
                         <div className="carousel-item shadow-sm" data-bs-interval="3000">
-                            <img src="https://oleico.com/wp-content/uploads/2020/05/original-7754e065acbcd16585cf6e3715fade0e.jpeg" className="img-fluid w-100" style={{ height: "250px", objectFit: "cover" }} />
+                            <img src="https://oleico.com/wp-content/uploads/2020/05/original-7754e065acbcd16585cf6e3715fade0e.jpeg" className="img-fluid w-100" style={{ height: "350px", objectFit: "cover" }} />
                         </div>
                         <div className="carousel-item shadow-sm" data-bs-interval="3000">
-                            <img src="https://www.clara.es/medio/2023/01/12/recetas-saludables_32d84f1c_1200x630.jpg" className="img-fluid w-100" style={{ height: "250px", objectFit: "cover" }} />
+                            <img src="https://www.clara.es/medio/2023/01/12/recetas-saludables_32d84f1c_1200x630.jpg" className="img-fluid w-100" style={{ height: "350px", objectFit: "cover" }} />
                         </div>
-                    </div>
+                    </div>  
                     <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
                         <span className="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span className="visually-hidden">Previous</span>
