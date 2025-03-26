@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+$font-family-base: 'Quicksand', sans-serif;
+
 $theme-colors: (
     "primary": #b05328,
     "secondary": #feaf0d,
@@ -5,5 +9,13 @@ $theme-colors: (
     "white": #f5f5f5,
     "blue": #abdbe5
 );
+
+:root {
+  --primary: #{map-get($theme-colors, "primary")};
+  --secondary: #{map-get($theme-colors, "secondary")};
+  --tomato: #{map-get($theme-colors, "tomato")};
+  --white: #{map-get($theme-colors, "white")};
+  --blue: #{map-get($theme-colors, "blue")};
+}
 
 @import 'bootstrap/scss/bootstrap';
