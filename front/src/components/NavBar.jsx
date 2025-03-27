@@ -17,7 +17,7 @@ const NavBar = ({ isAdmin }) => {
     }
 
     return (
-        <Navbar className="bg-blue">
+        <Navbar className="bg-blue fixed-top">
             <Container>
                 <Navbar.Brand className="text-primary">
                     <img className="img-logo" src={ logo } alt=""/>

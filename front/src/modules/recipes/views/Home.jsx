@@ -1,7 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useNavigate } from "react-router-dom";
-import Recipe from './Recipe'
+import { useNavigate } from "react-router";
 
 const Home = () => {
 
@@ -30,7 +29,7 @@ const Home = () => {
     return (
         <>
                         
-            <div className="container-fluid d-flex flex-column align-items-center">
+            <div className="container-fluid d-flex flex-column align-items-center mt-5">
                 <div id="carouselExampleInterval" className="carousel slide w-100" data-bs-ride="carousel">
                     <div className="carousel-inner">
                         <div className="carousel-item active shadow-sm" data-bs-interval="3000">

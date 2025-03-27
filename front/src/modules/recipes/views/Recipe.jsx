@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";         
 import { useState } from 'react';
 import NavBar from '../../../components/NavBar';
 
@@ -23,7 +23,7 @@ const Recipe = () => {
     return (
         <>
         
-        <div className="container-fluid align-items-center pt-4">
+        <div className="container-fluid align-items-center pt-4 mt-5">
             <div className="row d-flex position-relative ">
                 <div className="col-8">
                     <img src={cardData.img} className="img-fluid rounded shadow-sm w-100" alt={cardData.title} 
@@ -59,7 +59,16 @@ const Recipe = () => {
                 </div>
             </div>
 
-            
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-8">
+                        Ingredientes
+                    </div>
+                    <div className="col-4">
+                        Preparación
+                    </div>
+                </div>
+            </div>
 
         </div>
 
