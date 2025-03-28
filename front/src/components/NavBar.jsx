@@ -3,9 +3,11 @@ import {Navbar, Container, NavDropdown, Nav, Form, InputGroup} from 'react-boots
 import {LogOut, Search} from "react-feather";
 import '../styles/navbar.css'
 import logo from "../assets/logo-recetario.jpg"
+import { useNavigate } from "react-router";
 
 const NavBar = ({ isAdmin }) => {
     const [user, setUser] = useState()
+    const navigate = useNavigate(); 
 
     useEffect(() => {
         const name = localStorage.getItem("user") || "Usuario"
@@ -13,7 +15,7 @@ const NavBar = ({ isAdmin }) => {
     }, [])
 
     const logout = () => {
-
+        navigate('/'); 
     }
 
     return (
