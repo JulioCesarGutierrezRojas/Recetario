@@ -1,13 +1,30 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useLocation, useNavigate } from "react-router";         
-import { useState } from 'react';
+import { useLocation, useNavigate } from "react-router";
+import { useState, useEffect } from 'react';
+import NavBar from '../../../components/NavBar';
+import CommentSection from "../../comments/views/comment";
 
 const Recipe = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { cardData } = location.state || {}; 
-    const [averageRating, setAverageRating] = useState(4.2); 
+    const { cardData } = location.state || {};
+    
+    const [averageRating, setAverageRating] = useState(4.2);
+    const [reviews, setReviews] = useState([]); 
+
+    // Función para calcular la calificación promedio
+    const calculateAverageRating = (reviews) => {
+        if (reviews.length === 0) return 0;
+        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        return totalRating / reviews.length;
+    };
+
+    useEffect(() => {
+        // Calcula la calificación promedio cuando las reseñas cambian
+        setAverageRating(calculateAverageRating(reviews));
+    }, [reviews]);
+
     const ratingPercentage = (averageRating / 5) * 100;
 
     if (!cardData) {
@@ -20,41 +37,33 @@ const Recipe = () => {
     }
 
     return (
-        <>
-        
         <div className="container-fluid align-items-center pt-4 mt-5">
-            <div className="row d-flex position-relative ">
+            <div className="row d-flex position-relative">
                 <div className="col-8">
-                    <img src={cardData.img} className="img-fluid rounded shadow-sm w-100" alt={cardData.title} 
-                        style={{ height: "350px", objectFit: "cover" }}/>
+                    <img src={cardData.img} className="img-fluid rounded shadow-sm w-100" alt={cardData.title}
+                        style={{ height: "350px", objectFit: "cover" }} />
                 </div>
 
-                <div className="col-4 bg-white rounded shadow p-3 position-absolute "
+                <div className="col-4 bg-white rounded shadow p-3 position-absolute"
                     style={{ right: "15px", width: "30%", maxHeight: "350px", overflowY: "auto" }}>
                     <h5 className='text-center fw-bold'>Comentarios</h5>
-                    <p>Aquí van los comentarios...</p>
-                    <p>Aquí van los comentarios...</p>
-                    <p>Aquí van los comentarios...</p>
-                    <p>Aquí van los comentarios...</p>
-                    <p>Aquí van los comentarios...</p>
-                    <p>Aquí van los comentarios...</p>
-                    <p>Aquí van los comentarios...</p>
-                    <p>Aquí van los comentarios...</p>
+                    <CommentSection reviews={reviews} setReviews={setReviews} /> {/* Pasa las reseñas y setReviews */}
                 </div>
             </div>
-            
+
             <div className="mt-3 col-8">
-                <h6 className='text-center fw-bold'>Calificación General: {averageRating} / 5 🍽️</h6>
+                <h6 className='text-center fw-bold'>Calificación General: {averageRating.toFixed(1)} / 5 🍽️</h6>
                 <div className="progress" role="progressbar" aria-valuenow={ratingPercentage} aria-valuemin="0" aria-valuemax="100"
                     style={{ height: "25px", borderRadius: "15px", boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)" }}>
                     <div className="progress-bar text-bg-warning"
-                        style={{ width: `${ratingPercentage}%`, background: "linear-gradient(to right, #007bff, #00c6ff)", 
+                        style={{
+                            width: `${ratingPercentage}%`, background: "linear-gradient(to right, #ffaf00, #ff5400)",
                             borderRadius: "15px",
                             fontWeight: "bold",
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center"}}>
-                    </div>
+                            justifyContent: "center"
+                        }} />
                 </div>
             </div>
 
@@ -113,16 +122,7 @@ const Recipe = () => {
 
                 </div>
             </div>
-
-            <div className="d-flex justify-content-center mt-3 pb-4">
-                <button className="btn btn-primary px-4 py-2 rounded shadow-sm" onClick={() => navigate("/home")}>
-                    Regresar al inicio
-                </button>
-            </div>
-
         </div>
-
-        </>
     );
 };
 
