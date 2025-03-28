@@ -29,7 +29,7 @@ const Home = () => {
     return (
         <>
                         
-            <div className="container-fluid d-flex flex-column align-items-center mt-5">
+            <div className="container-fluid d-flex flex-column align-items-center pt-5 mt-3">
                 <div id="carouselExampleInterval" className="carousel slide w-100" data-bs-ride="carousel">
                     <div className="carousel-inner">
                         <div className="carousel-item active shadow-sm" data-bs-interval="3000">
@@ -53,8 +53,8 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className="container-fluid d-flex align-items-center justify-content-center shadow " style={{ height: "150px", backgroundColor: "#f8f9fa" }}>
-                <p className="fs-4 fw-bold text-center m-0">"Descubre las mejores recetas para cada ocasión"</p>
+            <div className="container-fluid d-flex align-items-center justify-content-center shadow mt-3" style={{ height: "150px", backgroundColor: "#f8f9fa" }}>
+                <p className="fs-4 fw-bold fst-italic text-primary text-center m-0">"Descubre las mejores recetas para cada ocasión"</p>
             </div>
 
 
