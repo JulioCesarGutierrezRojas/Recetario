@@ -23,4 +23,8 @@ urlpatterns = [
         path('auth/', include('authorization.urls')),
         path('users/', include('users.urls')),
     ])),
+    path('api/', include('recipes.urls')),
+    path('api/', include('comments.urls')),
+    path('api/', include('ratings.urls')),
+
 ]
