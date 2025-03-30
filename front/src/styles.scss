@@ -6,4 +6,14 @@ $theme-colors: (
     "blue": #abdbe5
 );
 
+@each $color, $value in $theme-colors {
+    .table-#{$color} {
+      --bs-table-bg: #{$value};
+      --bs-table-striped-bg: #{mix($value, white, 10%)};
+      --bs-table-hover-bg: #{mix($value, white, 20%)};
+      color: black; 
+    }
+  }
+  
+
 @import 'bootstrap/scss/bootstrap';
