@@ -32,7 +32,7 @@ def login(request):
             token['name'] = found_user.name
             token['role'] = found_user.role
 
-            return Response({'token': str(token), 'role': found_user.role, 'id': found_user.id}, status=status.HTTP_200_OK)
+            return Response({'token': str(token), 'role': found_user.role, 'id': found_user.id, 'user': found_user.name}, status=status.HTTP_200_OK)
 
         return Response({'error': 'Credenciales Invalidas'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
