@@ -7,7 +7,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    ingredient = IngredientSerializer()
+    ingredient = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
 
     class Meta:
         model = Recipe_Ingredient

@@ -4,7 +4,7 @@ from users.models import User
 
 # Modelo de Recetas, Ingredientes y Recetas-Ingredientes
 class Recipe(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes',null=True, blank=True)
     name = models.CharField(max_length=100)
     process = models.TextField()
     serving_council = models.TextField()

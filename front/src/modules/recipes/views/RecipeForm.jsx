@@ -1,12 +1,13 @@
 import { useState } from "react";
-import axios from "axios";
+import { showErrorToast, showSuccessToast } from "../../../kernel/alerts";
+import { getIngredients, createIngredient, createRecipe, associateIngredientsWithRecipe } from "../controller/controllerRecipeForm";
+
 
 const RecipeForm = () => {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [process, setProcess] = useState("");
   const [tips, setTips] = useState("");
-  const [image, setImage] = useState(null); // Cambiado a un archivo
+  const [image, setImage] = useState(null);
   const [ingredients, setIngredients] = useState([{ ingredient: "", quantity: "" }]);
 
   const handleIngredientChange = (index, event) => {
@@ -24,34 +25,61 @@ const RecipeForm = () => {
   };
 
   const handleImageChange = (event) => {
-    setImage(event.target.files[0]); // Captura el archivo de imagen
+    setImage(event.target.files[0]);
   };
+
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", title);
-    formData.append("description", description);
-    formData.append("process", process);
-    formData.append("serving_council", tips);
-    if (image) {
-      formData.append("image", image); // Agregar el archivo
-    }
-    ingredients.forEach((ingredient, index) => {
-      formData.append(`recipe_ingredients[${index}][ingredient]`, ingredient.ingredient);
-      formData.append(`recipe_ingredients[${index}][quantity]`, ingredient.quantity);
-    });
-
     try {
-      const response = await axios.post("http://localhost:8000/api/recipes/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      console.log("Receta creada:", response.data);
+      // Obtener los ingredientes existentes
+      const existingIngredients = await getIngredients();
+
+      // Verificar y crear los ingredientes si no existen
+      let ingredientMap = {}; 
+
+      for (let ingredient of ingredients) {
+        let foundIngredient = existingIngredients.find(
+          (ing) => ing.name.toLowerCase() === ingredient.ingredient.toLowerCase()
+        );
+
+        if (!foundIngredient) {
+          const newIngredient = await createIngredient(ingredient.ingredient);
+          foundIngredient = newIngredient;
+        }
+
+        ingredientMap[ingredient.ingredient] = foundIngredient.id; 
+      }
+
+      // Crear la receta
+      const formData = new FormData();
+      formData.append("name", title);
+      formData.append("process", process);
+      formData.append("serving_council", tips);
+      if (image) {
+        formData.append("image", image);
+      }
+
+      const recipeResponse = await createRecipe(formData);
+      const recipeId = recipeResponse.id;
+
+      // Asociar los ingredientes con la receta
+      await associateIngredientsWithRecipe(recipeId, ingredients.map(ingredient => ({
+        ...ingredient,
+        id: ingredientMap[ingredient.ingredient]
+      })));
+
+      showSuccessToast({ title: "Receta creada", text: "Se ha registrado exitosamente" });
+
     } catch (error) {
       console.error("Error al crear la receta:", error.response?.data || error.message);
+      showErrorToast({ title: "Error", text: "No se pudo crear la receta. Intenta de nuevo." });
     }
   };
+
+
 
   return (
     <div className="container mt-4">
@@ -60,10 +88,6 @@ const RecipeForm = () => {
         <div className="mb-3">
           <label className="form-label">Título</label>
           <input type="text" className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Descripción</label>
-          <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} required></textarea>
         </div>
         <div className="mb-3">
           <label className="form-label">Proceso</label>

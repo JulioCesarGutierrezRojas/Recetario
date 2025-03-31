@@ -1,24 +1,41 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useNavigate } from "react-router"; // Asegúrate de importar useNavigate desde react-router-dom
-import { useState } from 'react';
+import { useNavigate } from "react-router"; 
+import { useState, useEffect } from 'react';
+import axios from 'axios'; 
 
 const MyRecipes = () => {
-    console.log("MyRecipes se ha renderizado");
-
-    const navigate = useNavigate(); // Instanciamos el hook useNavigate
+    const navigate = useNavigate();
     const [recipes, setRecipes] = useState([]);
 
+    useEffect(() => {
+        const fetchRecipes = async () => {
+            try {
+                const response = await axios.get("http://localhost:8000/api/recipes/"); 
+                setRecipes(response.data); 
+            } catch (error) {
+                console.error("Error al obtener las recetas:", error);
+            }
+        };
+
+        fetchRecipes(); 
+    }, []); 
+
     const handleCreateRecipe = () => {
-        navigate("/recipeform"); // Redirige a la página de creación de recetas
+        navigate("/recipeform"); 
     };
 
     const handleEditRecipe = (id) => {
         alert(`Editar receta con ID: ${id}`);
     };
 
-    const handleDeleteRecipe = (id) => {
-        setRecipes(recipes.filter(recipe => recipe.id !== id));
+    const handleDeleteRecipe = async (id) => {
+        try {
+            await axios.delete(`http://localhost:8000/api/recipes/${id}`); 
+            setRecipes(recipes.filter(recipe => recipe.id !== id)); 
+        } catch (error) {
+            console.error("Error al eliminar la receta:", error);
+        }
     };
 
     return (
@@ -32,8 +49,8 @@ const MyRecipes = () => {
                     <div key={recipe.id} className="col-md-4 mb-4">
                         <div className="card shadow-sm">
                             <div className="card-body">
-                                <h5 className="card-title">{recipe.title}</h5>
-                                <img src={recipe.image} alt={recipe.title} className="card-img-top" />
+                                <h5 className="card-title">{recipe.name}</h5>
+                                <img src={recipe.image} alt={recipe.name} className="card-img-top" />
                                 <p className="card-text">{recipe.description}</p>
                                 <div className="d-flex justify-content-between">
                                     <button className="btn btn-primary" onClick={() => handleEditRecipe(recipe.id)}>Editar</button>
