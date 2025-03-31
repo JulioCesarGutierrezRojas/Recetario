@@ -8,6 +8,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     ingredient = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    #linea anterior: ingredient = IngredientSerializer()
 
     class Meta:
         model = Recipe_Ingredient
