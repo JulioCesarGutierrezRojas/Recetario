@@ -15,6 +15,9 @@ const NavBar = ({ isAdmin }) => {
     }, [])
 
     const logout = () => {
+        localStorage.removeItem('token')
+        localStorage.removeItem('role')
+        localStorage.removeItem('user')
         navigate('/'); 
     }
 
@@ -26,7 +29,7 @@ const NavBar = ({ isAdmin }) => {
                     Recetario
                 </Navbar.Brand>
                 <Nav className="ms-auto">
-                    <Form inline className="me-3">
+                    <Form className="d-inline me-3">
                         <InputGroup>
                             <Form.Control
                                 placeholder="Busqueda"
