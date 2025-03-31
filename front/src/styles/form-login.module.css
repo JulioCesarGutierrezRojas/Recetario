@@ -1,0 +1,168 @@
+.container {
+    display: flex;
+    height: 100vh;
+    background-color: var(--white);
+}
+
+.leftPanel {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary), var(--tomato));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.rightPanel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    padding: 15px;
+}
+
+.logoContainer {
+    text-align: center;
+    color: var(--white);
+}
+
+.logoWrapper {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 1.5rem;
+    border: 4px solid var(--secondary);
+    background-color: white;
+}
+
+.logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.appName {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--secondary);
+}
+
+.form {
+    background: white;
+    padding: 1rem 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+}
+
+.title {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--primary);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.formGroup {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.label {
+    display: block;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--blue);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--white);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: none;
+}
+
+.submitButton {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--tomato);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+    background-color: #a40406;
+}
+
+.linksContainer {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.link {
+    color: var(--tomato);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+    font-weight: 600;
+}
+
+.link:hover {
+    color: #a40406;
+}
+
+.signupText {
+    color: var(--primary);
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.passwordInputGroup {
+    position: relative;
+}
+
+.passwordToggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: var(--primary);
+    transition: color 0.3s ease;
+}
+
+.passwordToggle:hover {
+    color: var(--tomato);
+}
+
+.passwordToggle svg {
+    vertical-align: middle;
+}
