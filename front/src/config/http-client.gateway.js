@@ -95,7 +95,7 @@ export const handleRequest = async (method, url, payload) => {
     try {
         const { status, data } = await httpClient[method](url, payload);
         return {
-            result: status === 200 ? data.result : null,
+            result: status === 200 ? data : null,
             metadata: status === 200 ? data.metadata : null,
             type: data.type || 'SUCCESS',
             text: data.text || 'Operación exitosa'
@@ -105,7 +105,7 @@ export const handleRequest = async (method, url, payload) => {
             result: null,
             metadata: null,
             type: 'ERROR',
-            text: error.response?.data?.text || `Error en solicitud ${method}`
+            text: error.response?.data?.error || `Error en solicitud ${method}`
         };
     }
 };
