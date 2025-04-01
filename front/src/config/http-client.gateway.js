@@ -101,11 +101,25 @@ export const handleRequest = async (method, url, payload) => {
             text: data.text || 'Operación exitosa'
         };
     } catch (error) {
+        let errorMessage = `Error en solicitud ${method}`;
+
+        if (error.response?.data) {
+            const errorData = error.response.data;
+            if (typeof errorData === 'string') {
+                errorMessage = errorData;
+            } else if (typeof errorData === 'object') {
+                const firstError = Object.values(errorData).flat().find(msg => typeof msg === 'string');
+                if (firstError) {
+                    errorMessage = firstError;
+                }
+            }
+        }
+
         return {
             result: null,
             metadata: null,
             type: 'ERROR',
-            text: error.response?.data?.error || `Error en solicitud ${method}`
+            text: errorMessage
         };
     }
 };

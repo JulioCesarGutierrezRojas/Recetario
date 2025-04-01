@@ -23,9 +23,6 @@ def login(request):
 
         found_user = User.objects.filter(email=user.validated_data['email']).first()
 
-        if not found_user.is_active:
-            return Response({'error': 'Usuario inactivo'}, status=status.HTTP_400_BAD_REQUEST)
-
         if found_user and found_user.check_password(user.validated_data['password']):
             token = AccessToken.for_user(found_user)
             token['email'] = found_user.email
