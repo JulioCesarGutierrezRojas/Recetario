@@ -166,3 +166,34 @@
 .passwordToggle svg {
     vertical-align: middle;
 }
+
+/* Estilos para el proceso de restablecimiento */
+.progress {
+    background-color: var(--blue);
+}
+
+.progress-bar {
+    background-color: var(--tomato);
+    transition: width 0.5s ease;
+}
+
+/* Estilos para el código de verificación */
+.token-input {
+    letter-spacing: 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 0.5rem 0;
+}
+
+/* Ajustes para los mensajes */
+.reset-message {
+    color: var(--primary);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.email-highlight {
+    color: var(--tomato);
+    font-weight: 600;
+}
