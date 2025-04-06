@@ -15,12 +15,12 @@ def send_recovery_email(email, token, name):
         <html>
           <body>
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #2563eb;">Restablecimiento de Contraseña</h2>
+              <h2 style="color: #cd0508;">Restablecimiento de Contraseña</h2>
               <p>Hola, {name}</p>
               <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.</p>
               <div style="background-color: #f3f4f6; padding: 1rem; margin: 1rem 0; border-radius: 0.5rem;">
                 <p style="margin: 0;">Tu código de verificación es:</p>
-                <h3 style="color: #2563eb; margin: 0.5rem 0;">{token}</h3>
+                <h3 style="color: #cd0508; margin: 0.5rem 0;">{token}</h3>
               </div>
               <p style="margin-top: 1rem; color: #6b7280;">
                 Si no solicitaste este cambio, por favor ignora este mensaje.<br>
