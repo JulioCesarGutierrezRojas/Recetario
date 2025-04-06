@@ -9,6 +9,7 @@ const PasswordResetScreen = () => {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [token, setToken] = useState('');
+    const [user, setUser] = useState(null);
 
     return (
         <div className={styles.container} style={{backgroundColor: 'var(--white)'}}>
@@ -74,8 +75,8 @@ const PasswordResetScreen = () => {
                     </div>
 
                     {step === 1 && <RequestReset email={email} setEmail={setEmail} setStep={setStep} />}
-                    {step === 2 && <ValidateToken email={email} token={token} setToken={setToken} setStep={setStep} />}
-                    {step === 3 && <ChangePassword email={email} token={token} setStep={setStep} />}
+                    {step === 2 && <ValidateToken email={email} token={token} setToken={setToken} setStep={setStep} setUser={setUser}/>}
+                    {step === 3 && <ChangePassword email={email} token={token} setStep={setStep} user={user}/>}
 
                     <div style={{
                         marginTop: '1.5rem',

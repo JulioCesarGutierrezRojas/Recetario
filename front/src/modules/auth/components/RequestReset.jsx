@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import styles from '../../../styles/form-login.module.css';
-import {showAlert} from "../../../kernel/alerts.js";
+import {showSuccessToast, showWarningToast} from "../../../kernel/alerts.js";
 import {sendEmail} from "../controller/controller.js";
 import Loader from "../../../components/Loader.jsx";
 
@@ -12,14 +12,13 @@ const RequestReset = ({ email, setEmail, setStep }) => {
         setIsLoading(true);
         try {
             const response = await sendEmail(email);
-            showAlert("Éxito", response, "success");
+            showSuccessToast({ title: 'Exito', text: response })
+            setStep(2);
         } catch (e) {
-            showAlert('Error', e.message, 'error');
+            showWarningToast({ title: 'Error', text: e.message });
         } finally {
             setIsLoading(false);
         }
-
-        setStep(2);
     };
 
     return (
