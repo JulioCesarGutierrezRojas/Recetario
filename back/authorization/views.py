@@ -23,16 +23,13 @@ def login(request):
 
         found_user = User.objects.filter(email=user.validated_data['email']).first()
 
-        if not found_user.is_active:
-            return Response({'error': 'Usuario inactivo'}, status=status.HTTP_400_BAD_REQUEST)
-
         if found_user and found_user.check_password(user.validated_data['password']):
             token = AccessToken.for_user(found_user)
             token['email'] = found_user.email
             token['name'] = found_user.name
             token['role'] = found_user.role
 
-            return Response({'token': str(token), 'role': found_user.role, 'id': found_user.id}, status=status.HTTP_200_OK)
+            return Response({'token': str(token), 'role': found_user.role, 'id': found_user.id, 'user': found_user.name}, status=status.HTTP_200_OK)
 
         return Response({'error': 'Credenciales Invalidas'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
