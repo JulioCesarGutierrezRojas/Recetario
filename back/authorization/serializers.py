@@ -8,6 +8,20 @@ class LoginDTO(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
+    def validate(self, data):
+        if not User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError("Usuario no encontrado")
+
+        user = User.objects.get(email=data['email'])
+
+        if not user.check_password(data['password']):
+            raise serializers.ValidationError("Credenciales Incorrectas")
+
+        if not user.is_active:
+            raise serializers.ValidationError("Usuario inactivo")
+
+        return data
+
 class SendEmailRecoverDTO(serializers.Serializer):
     email = serializers.EmailField()
 
