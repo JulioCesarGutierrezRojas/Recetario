@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { getRecipes} from "../controller/controllerRecipeForm";
 
 
 const MyRecipes = () => {
@@ -18,16 +19,16 @@ const MyRecipes = () => {
 
     useEffect(() => {
         const fetchRecipes = async () => {
-            try {
-                const response = await axios.get("http://localhost:8000/api/recipes/");
-                setRecipes(response.data);
-            } catch (error) {
-                console.error("Error al obtener las recetas:", error);
-            }
+          try {
+            const data = await getRecipes();
+            setRecipes(data);
+          } catch (error) {
+            console.error("Error al cargar las recetas:", error);
+          }
         };
-
+    
         fetchRecipes();
-    }, []);
+      }, []);
 
     const handleCreateRecipe = () => {
         navigate("/recipeform");
@@ -168,7 +169,8 @@ const MyRecipes = () => {
     
 
     return (
-        <div className="container mt-4" style={{ paddingTop: '80px' }}>
+        <div className="container pt-5 mt-4" style={{ paddingTop: '120px' }}>
+
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h1>Mis Recetas</h1>
                 <button className="btn btn-success" onClick={handleCreateRecipe}>Crear Receta</button>

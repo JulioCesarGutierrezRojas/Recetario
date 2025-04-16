@@ -28,56 +28,72 @@ const RecipeForm = () => {
     setImage(event.target.files[0]);
   };
 
+  // Función para verificar si el ingrediente existe y crear uno nuevo si es necesario
+const createIngredientIfNeeded = async (ingredientName) => {
+  try {
+    const existingIngredients = await getIngredients(); // Obtener todos los ingredientes existentes
+    let foundIngredient = existingIngredients.find(
+      (ing) => ing.name.toLowerCase() === ingredientName.toLowerCase()
+    );
 
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    try {
-      // Obtener los ingredientes existentes
-      const existingIngredients = await getIngredients();
-
-      // Verificar y crear los ingredientes si no existen
-      let ingredientMap = {}; 
-
-      for (let ingredient of ingredients) {
-        let foundIngredient = existingIngredients.find(
-          (ing) => ing.name.toLowerCase() === ingredient.ingredient.toLowerCase()
-        );
-
-        if (!foundIngredient) {
-          const newIngredient = await createIngredient(ingredient.ingredient);
-          foundIngredient = newIngredient;
-        }
-
-        ingredientMap[ingredient.ingredient] = foundIngredient.id; 
-      }
-
-      // Crear la receta
-      const formData = new FormData();
-      formData.append("name", title);
-      formData.append("process", process);
-      formData.append("serving_council", tips);
-      if (image) {
-        formData.append("image", image);
-      }
-
-      const recipeResponse = await createRecipe(formData);
-      const recipeId = recipeResponse.id;
-
-      // Asociar los ingredientes con la receta
-      await associateIngredientsWithRecipe(recipeId, ingredients.map(ingredient => ({
-        ...ingredient,
-        id: ingredientMap[ingredient.ingredient]
-      })));
-
-      showSuccessToast({ title: "Receta creada", text: "Se ha registrado exitosamente" });
-
-    } catch (error) {
-      console.error("Error al crear la receta:", error.response?.data || error.message);
-      showErrorToast({ title: "Error", text: "No se pudo crear la receta. Intenta de nuevo." });
+    if (!foundIngredient) {
+      // Si el ingrediente no existe, crear uno nuevo
+      const newIngredient = await createIngredient(ingredientName);
+      foundIngredient = newIngredient;
     }
-  };
+
+    return foundIngredient; // Devuelve el ingrediente encontrado o creado
+  } catch (error) {
+    console.error("Error al crear o buscar ingrediente:", error);
+    throw new Error("Error al crear o buscar ingrediente.");
+  }
+};
+
+
+
+
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  try {
+    let ingredientMap = {}; 
+
+    // Asociar o crear ingredientes
+    for (let ingredient of ingredients) {
+      let foundIngredient = await createIngredientIfNeeded(ingredient.ingredient);
+      ingredientMap[ingredient.ingredient] = foundIngredient.id;
+    }
+
+    // Crear la receta
+    const formData = new FormData();
+    formData.append("name", title);
+    formData.append("process", process);
+    formData.append("serving_council", tips);
+    if (image) {
+      formData.append("image", image);
+    }
+
+    const recipeResponse = await createRecipe(formData);  // Esto va a /api/recipes/
+    const recipeId = recipeResponse.id;
+
+    // Asociar los ingredientes con la receta
+    const ingredientAssociations = ingredients.map(ingredient => ({
+      recipe: recipeId,
+      ingredient: ingredientMap[ingredient.ingredient],  // Usamos el ID del ingrediente
+      quantity: ingredient.quantity
+    }));
+
+    // Esto podría ser optimizado dependiendo de cómo la API maneje los datos de ingredientes
+    await associateIngredientsWithRecipe(recipeId, ingredientAssociations);
+
+    showSuccessToast({ title: "Receta creada", text: "Se ha registrado exitosamente" });
+  } catch (error) {
+    console.error("Error al crear la receta:", error.response?.data || error.message);
+    showErrorToast({ title: "Error", text: "No se pudo crear la receta. Intenta de nuevo." });
+  }
+};
+
+  
 
 
 
