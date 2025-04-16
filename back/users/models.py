@@ -3,13 +3,13 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
 class Sex(models.TextChoices):
-    FEMALE = "F", "Female"
-    MALE = "M", "Male"
-    OTHER = "O", "Other"
+    FEMALE = "Femenino"
+    MALE = "Masculino"
+    OTHER = "Otro"
 
 class Role(models.TextChoices):
-    ADMIN = "admin", "Administrador"
-    USER = "user", "Usuario"
+    ADMIN = "Administrador"
+    USER = "Usuario"
 
 #Modelo de usuarios
 class CustomUserManager(BaseUserManager):
@@ -34,11 +34,10 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
-    token = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=100)
-    sex = models.CharField(max_length=10, choices=Sex.choices, default=Sex.OTHER)
+    sex = models.CharField(max_length=20, choices=Sex.choices, default=Sex.OTHER)
     created_at = models.DateTimeField(auto_now_add=True)
-    role = models.CharField(max_length=10, choices=Role.choices, default=Role.USER)
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.USER)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -50,3 +49,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class Token(models.Model):
+    token = models.CharField(max_length= 10, unique=True, null=False, default="")
+    date_expiration = models.DateTimeField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.token

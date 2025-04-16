@@ -2,8 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useLocation, useNavigate } from "react-router";
 import { useState, useEffect } from 'react';
-import NavBar from '../../../components/NavBar';
 import CommentSection from "../../comments/views/comment";
+
 
 const Recipe = () => {
     const location = useLocation();
@@ -46,8 +46,7 @@ const Recipe = () => {
 
                 <div className="col-4 bg-white rounded shadow p-3 position-absolute"
                     style={{ right: "15px", width: "30%", maxHeight: "350px", overflowY: "auto" }}>
-                    <h5 className='text-center fw-bold'>Comentarios</h5>
-                    <CommentSection reviews={reviews} setReviews={setReviews} /> {/* Pasa las reseñas y setReviews */}
+                    <CommentSection reviews={reviews} setReviews={setReviews} />
                 </div>
             </div>
 
@@ -57,7 +56,7 @@ const Recipe = () => {
                     style={{ height: "25px", borderRadius: "15px", boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)" }}>
                     <div className="progress-bar text-bg-warning"
                         style={{
-                            width: `${ratingPercentage}%`, background: "linear-gradient(to right, #ffaf00, #ff5400)",
+                            width: `${ratingPercentage}%`, background: "linear-gradient(to right, #007bff, #00c6ff)",
                             borderRadius: "15px",
                             fontWeight: "bold",
                             display: "flex",
@@ -67,15 +66,66 @@ const Recipe = () => {
                 </div>
             </div>
 
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-8">
-                        Ingredientes
-                    </div>
-                    <div className="col-4">
-                        Preparación
+            <div className="container-fluid pb-4 ps-5 d-flex">
+                <div className="row mt-4 h-auto">
+                    <div className=" bg-body-secondary rounded shadow" style={{width:300}}>
+                        <h5 className='fw-bold mt-2'>Ingredientes</h5>
+                        <ul className="list-unstyled mt-3">
+                            {["Harina", "Azúcar", "Leche", "Huevos", "Mantequilla"].map((ingrediente, index) => (
+                                <li key={index} className="d-flex align-items-center mt-2">
+                                    <input type="checkbox" id={`ingrediente-${index}`} className="form-check-input me-2"/>
+                                    <label htmlFor={`ingrediente-${index}`} className="form-check-label">
+                                        {ingrediente}
+                                    </label>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
+                <div className="container-fluid ms-5 h-auto">
+                    <div className="row mt-4">
+                        <div className="rounded shadow">
+                            <h5 className='fw-bold mt-2 text-center'>Procedimiento</h5>
+                            <ul className="list-unstyled mt-3">
+                                <li className="d-flex align-items-center mt-2">
+                                    <label className="form-check-label text-justify">
+                                    Calienta el aceite vegetal en una olla y agrega la cebolla, el ajo, el tomate verde y el chile jalapeño. Cocina por 8 minutos, retira y coloca en una licuadora.
+                                    </label>
+                                </li>
+                                <li className="d-flex align-items-center mt-2">
+                                    <label className="form-check-label text-justify">
+                                    Licúa los tomates, la cebolla, el chile, el ajo, el jalapeño, el caldo de pollo, la crema ácida, la sal y la pimienta por 2 minutos.
+                                    </label>
+                                </li>
+                                <li className="d-flex align-items-center mt-2">
+                                    <label className="form-check-label text-justify">
+                                    Derrite la mantequilla en una sartén de hierro a fuego medio, agrega la cebolla y cocina por 2 minutos. Después añade los chayotes y la salsa y cocina a fuego bajo por 5 minutos.
+                                    Agrega el queso manchego y hornea a 200 °C por 5 minutos. Sirve los chayotes suizos en la misma sartén, decora con hojas de cilantro y acompaña con arroz blanco.
+                                    </label>    
+                                </li>
+                                <li className="d-flex align-items-center mt-2">
+                                    <label className="form-check-label text-justify">
+                                    Derrite la mantequilla en una sartén de hierro a fuego medio, agrega la cebolla y cocina por 2 minutos. Después añade los chayotes y la salsa y cocina a fuego bajo por 5 minutos.
+                                    Agrega el queso manchego y hornea a 200 °C por 5 minutos. Sirve los chayotes suizos en la misma sartén, decora con hojas de cilantro y acompaña con arroz blanco.
+                                    </label>    
+                                </li>
+                                <li className="d-flex align-items-center mt-2">
+                                    <label className="form-check-label text-justify">
+                                    Derrite la mantequilla en una sartén de hierro a fuego medio, agrega la cebolla y cocina por 2 minutos. Después añade los chayotes y la salsa y cocina a fuego bajo por 5 minutos.
+                                    Agrega el queso manchego y hornea a 200 °C por 5 minutos. Sirve los chayotes suizos en la misma sartén, decora con hojas de cilantro y acompaña con arroz blanco.
+                                    </label>    
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div className="d-flex justify-content-center mt-3 pb-4">
+                <button className="btn btn-primary px-4 py-2 rounded shadow-sm" onClick={() => navigate("/home")}>
+                    Regresar al inicio
+                </button>
             </div>
         </div>
     );

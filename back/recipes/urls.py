@@ -1,9 +1,10 @@
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import RecipeViewSet, IngredientViewSet, RecipeIngredientViewSet
+from .views import RecipeViewSet
 
 router = DefaultRouter()
-router.register(r'recipes', RecipeViewSet)
-router.register(r'ingredients', IngredientViewSet)
-router.register(r'recipe_ingredients', RecipeIngredientViewSet)
+router.register(r'', RecipeViewSet)
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('', include(router.urls)),
+]

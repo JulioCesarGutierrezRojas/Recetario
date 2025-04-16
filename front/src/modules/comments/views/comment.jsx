@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import Ratings from "../../ratings/views/rating";
 import { FaUtensilSpoon } from "react-icons/fa";
-
+import Ratings from '../../ratings/views/Ratings'
 
 
 const CommentSection = ({ reviews, setReviews }) => {
@@ -30,11 +29,10 @@ const CommentSection = ({ reviews, setReviews }) => {
 
   return (
     <div style={{ maxWidth: "600px", margin: "20px auto", textAlign: "left" }}>
-      <h2>Reseñas de clientes</h2>
 
       {/* Sección para agregar una nueva reseña */}
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <h4>Deja tu calificación:</h4>
+      <h4 className='fw-bold'>Deja tu calificación:</h4>
         <Ratings rating={rating} setRating={setRating} />
 
         <textarea
@@ -51,19 +49,15 @@ const CommentSection = ({ reviews, setReviews }) => {
           }}
         ></textarea>
 
-        <button
-          className="btn"
-          type="submit"
-          style={{ backgroundColor: "#007bff", borderColor: "#007bff", color: "#fff" }}
-        >
-          Enviar Reseña
+        <button className="btn fw-bolder" type="submit" style={{ backgroundColor: "#007bff", borderColor: "#007bff", color: "#fff" }}>
+          Enviar Comentario
         </button>
 
 
       </form>
 
       {/* Sección de comentarios */}
-      <h3>Reseñas ({reviews.length})</h3>
+      <h5>Comentarios ({reviews.length}):</h5>
       {reviews.length === 0 ? (
         <p>No hay reseñas aún.</p>
       ) : (
@@ -72,7 +66,7 @@ const CommentSection = ({ reviews, setReviews }) => {
             <div>
               {/* Mostrar las estrellas de la calificación */}
               {Array.from({ length: review.rating }).map((_, i) => (
-                <FaUtensilSpoon key={i} size={20} color="#8B4513" />
+                <FaUtensilSpoon key={i} size={20} color="#FFCC00" />
               ))}
             </div>
             <p>{review.comment}</p>
