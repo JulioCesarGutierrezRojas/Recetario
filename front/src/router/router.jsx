@@ -4,6 +4,7 @@ import NavBar from "../components/NavBar.jsx";
 import Home from "../modules/recipes/views/Home.jsx";
 import Recipe from "../modules/recipes/views/Recipe.jsx";
 import PasswordReset from "../modules/auth/views/RecoverPassword.jsx";
+import Register from "../modules/auth/views/Register.jsx";
 
 const AppRouter = () => {
     const location = useLocation();
@@ -19,6 +20,7 @@ const AppRouter = () => {
                 <Route path="/home" element={<Home />} />
                 <Route path="/recipe" element={<Recipe />} />
                 <Route path="/forgot-password" element={<PasswordReset />} />
+                <Route path="/signup" element={<Register />}/>
             </Routes>
         </>
     );

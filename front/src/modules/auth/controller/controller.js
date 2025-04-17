@@ -39,3 +39,12 @@ export const changePassword = async (user,  new_password, confirm_password) => {
 
     return response.result;
 }
+
+export const registerUser = async (name, email, sex, password) => {
+    const response = await handleRequest('post', '/users/register/', {name, email, sex, password})
+    console.log('registerUser:', response)
+    if (response.type !== 'SUCCESS')
+        throw new Error(response.text);
+
+    return response.text;
+}

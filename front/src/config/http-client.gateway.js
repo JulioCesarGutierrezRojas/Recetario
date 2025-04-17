@@ -98,17 +98,27 @@ export const handleRequest = async (method, url, payload) => {
             result: status === 200 ? data : null,
             metadata: status === 200 ? data.metadata : null,
             type: data.type || 'SUCCESS',
-            text: data.text || 'Operación exitosa'
+            text: data.text || data.message || 'Operación exitosa'
         };
     } catch (error) {
         let errorMessage = `Error en solicitud ${method}`;
 
         if (error.response?.data) {
-            const errorData = error.response.data;
+            let errorData = error.response.data;
+
+            // Asegurarse de acceder a la propiedad 'error' si existe
+            if (errorData.error && typeof errorData.error === 'object') {
+                errorData = errorData.error;
+            }
+
             if (typeof errorData === 'string') {
                 errorMessage = errorData;
             } else if (typeof errorData === 'object') {
-                const firstError = Object.values(errorData).flat().find(msg => typeof msg === 'string');
+                // Buscar el primer mensaje de error en los valores del objeto
+                const firstError = Object.values(errorData)
+                    .flat()
+                    .find(msg => typeof msg === 'string');
+
                 if (firstError) {
                     errorMessage = firstError;
                 }
