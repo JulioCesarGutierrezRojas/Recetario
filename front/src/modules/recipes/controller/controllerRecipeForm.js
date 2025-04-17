@@ -1,15 +1,12 @@
 import axios from 'axios';
 
 // Obtener el token de localStorage
-const getToken = () => localStorage.getItem('token');  // O donde guardes el token
-
+const getToken = () => localStorage.getItem('token'); 
 
 // Función para obtener ingredientes existentes
 export const getIngredients = async () => {
   try {
     const token = getToken();
-    console.log("Obteniendo ingredientes con token:", token);  // 🧪 DEBUG
-
     const response = await axios.get("http://localhost:8000/api/recipes/", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -29,7 +26,7 @@ export const createIngredient = async (ingredientName, ingredientQuantity) => {
   try {
     const token = getToken(); 
     const response = await axios.post(
-      "http://localhost:8000/api/recipes/", // Asegúrate que este endpoint existe
+      "http://localhost:8000/api/recipes/", 
       {
         name: ingredientName,
         quantity: ingredientQuantity
@@ -56,14 +53,14 @@ export const createIngredient = async (ingredientName, ingredientQuantity) => {
 // Función para crear una receta
 export const createRecipe = async (formData) => {
   try {
-    const token = getToken();  // Obtener el token
+    const token = getToken();  
     const response = await axios.post(
       "http://localhost:8000/api/recipes/",
       formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,  // Agregar el token en los encabezados
+          Authorization: `Bearer ${token}`,  
         },
       }
     );
@@ -77,7 +74,7 @@ export const createRecipe = async (formData) => {
 // Función para asociar ingredientes con la receta
 export const associateIngredientsWithRecipe = async (recipeId, ingredients) => {
   try {
-    const token = getToken();  // Obtener el token
+    const token = getToken();  
     for (let ingredient of ingredients) {
       await axios.post(
         "http://localhost:8000/api/recipe_ingredients/",
@@ -88,7 +85,7 @@ export const associateIngredientsWithRecipe = async (recipeId, ingredients) => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,  // Agregar el token en los encabezados
+            Authorization: `Bearer ${token}`, 
           },
         }
       );
