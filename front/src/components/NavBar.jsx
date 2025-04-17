@@ -22,9 +22,9 @@ const NavBar = ({ isAdmin }) => {
     }
 
     return (
-        <Navbar className="bg-blue fixed-top">
+        <Navbar className="bg-navbar fixed-top">
             <Container>
-                <Navbar.Brand className="text-primary">
+                <Navbar.Brand className="text-secondary">
                     <img className="img-logo" src={logo} alt="" />
                     Recetario
                 </Navbar.Brand>
@@ -38,7 +38,7 @@ const NavBar = ({ isAdmin }) => {
                             <InputGroup.Text><Search size={20} /></InputGroup.Text>
                         </InputGroup>
                     </Form>
-                    <NavDropdown title={<span className="text-primary">{user}</span>} align="end" className="custom-dropdown">
+                    <NavDropdown title={<span className="text-secondary">{user}</span>} align="end" className="custom-dropdown">
                         {isAdmin ? (
                             <>
                                 <NavDropdown.Item onClick={() => navigate("/myrecipes")}>

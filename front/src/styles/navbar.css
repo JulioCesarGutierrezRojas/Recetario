@@ -20,7 +20,7 @@
 }
 
 .custom-dropdown .dropdown-toggle::after {
-    border-top-color: var(--primary) !important;
+    border-top-color: var(--secondary) !important;
 }
 
 .input-group {
@@ -58,4 +58,8 @@
     border-left: none;
     background: var(--white);
     z-index: 2;
+}
+
+.bg-navbar {
+    background: linear-gradient(135deg, var(--primary), var(--tomato));
 }
