@@ -9,7 +9,7 @@ import { getRecipes, updateRecipe, deleteRecipe } from "../controller/controller
 
 
 const MyRecipes = () => {
-    
+
     const navigate = useNavigate();
     const [recipes, setRecipes] = useState([]);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -22,14 +22,14 @@ const MyRecipes = () => {
     useEffect(() => {
         const fetchRecipes = async () => {
             try {
-                const data = await getRecipes();
-                // console.log("Datos de recetas recibidos:", data); // Para debug
-                setRecipes(data);
+                const response = await getRecipes();
+                const recipesData = Array.isArray(response) ? response : [];
+                setRecipes(recipesData);
             } catch (error) {
-                console.error("Error al cargar las recetas:", error);
+                console.error("Error al cargar recetas:", error);
+                setRecipes([]);
             }
         };
-
         fetchRecipes();
     }, []);
 
@@ -37,64 +37,36 @@ const MyRecipes = () => {
         navigate("/recipeform");
     };
 
-   
-    
+
+
     const handleEditRecipe = async (recipe) => {
-        // console.log("Receta seleccionada:", recipe);
+        console.log("Recipe data received:", recipe); // Para depuración
+        
         setSelectedRecipe(recipe);
         setTitle(recipe.name);
         setProcess(recipe.process);
         setTips(recipe.serving_council);
     
         let mappedIngredients = [];
-        
-        if (recipe.recipe_ingredients && recipe.recipe_ingredients.length > 0) {
+    
+        if (recipe.recipe_ingredients?.length > 0) {
             mappedIngredients = recipe.recipe_ingredients.map(item => {
-                if (typeof item.ingredient === 'object' && item.ingredient.name) {
-                    return {
-                        name: item.ingredient.name,
-                        quantity: item.quantity || "",
-                        id: item.id
-                    };
-                }
+                console.log("Current ingredient item:", item); // Para depuración
                 return {
-                    name: `Ingrediente #${item.ingredient}`, 
+                    name: item.ingredient?.name || item.ingredient || "",
                     quantity: item.quantity || "",
-                    id: item.id
+                    id: item.id || undefined
                 };
             });
         } else {
             mappedIngredients = [{ name: "", quantity: "" }];
         }
     
-       // console.log("Ingredientes mapeados:", mappedIngredients);
+        console.log("Mapped ingredients:", mappedIngredients); // Para ver el resultado
         setIngredients(mappedIngredients);
         setImage(recipe.image);
     };
-
-    const handleDeleteRecipe = async (id) => {
-        const result = await Swal.fire({
-            title: '¿Estás seguro?',
-            text: "¡Esta receta será eliminada permanentemente!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        });
     
-        if (result.isConfirmed) {
-            try {
-                await deleteRecipe(id); // Usando la función del controlador
-                setRecipes(recipes.filter(recipe => recipe.id !== id));
-                showSuccessToast({ title: "Receta eliminada", text: "¡Éxito!" });
-            } catch (error) {
-                console.error("Error al eliminar:", error);
-                showErrorToast({ title: "Error", text: error.message || "Error al eliminar la receta." });
-            }
-        }
-    };
-
     const handleIngredientChange = (index, event) => {
         const newIngredients = [...ingredients];
         newIngredients[index][event.target.name] = event.target.value;
@@ -115,72 +87,119 @@ const MyRecipes = () => {
         }
     };
 
+    const handleDeleteRecipe = async (id) => {
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡Esta receta será eliminada permanentemente!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await deleteRecipe(id);
+
+                if (response.type === 'SUCCESS') {
+                    setRecipes(prev => prev.filter(recipe => recipe.id !== id));
+                    showSuccessToast({ title: "Receta eliminada", text: "¡Éxito!" });
+                } else {
+                    throw new Error(response.text);
+                }
+            } catch (error) {
+                showErrorToast({ title: "Error", text: error.message || "Error al eliminar la receta." });
+            }
+        }
+    };
+
     const handleSaveEdit = async () => {
         if (!selectedRecipe) return;
-      
-        const result = await Swal.fire({
-          title: '¿Estás seguro?',
-          text: "Se actualizarán los datos de la receta.",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Sí, actualizar',
-          cancelButtonText: 'Cancelar',
-          reverseButtons: true
-        });
-      
-        if (result.isConfirmed) {
-          try {
-            const recipeData = {
-              name: title,
-              process: process,
-              serving_council: tips,
-              image: image,
-              ingredients: ingredients
-                .filter(ing => ing.name.trim() !== "" && ing.quantity.trim() !== "")
-                .map(ing => ({
-                  name: ing.name,
-                  quantity: ing.quantity
-                }))
-            };
-      
-           // console.log("Datos a enviar:", recipeData);
-            
-            const updatedRecipe = await updateRecipe(selectedRecipe.id, recipeData);
-            
-            showSuccessToast({ title: "Receta actualizada", text: "¡Éxito!" });
-            
-            const freshRecipes = await getRecipes();
-            setRecipes(freshRecipes);
     
-            const modalElement = document.getElementById('editRecipeModal');
-            if (modalElement) {
-              modalElement.classList.remove('show');
-              modalElement.style.display = 'none';
-              document.body.classList.remove('modal-open');
-              const backdrop = document.querySelector('.modal-backdrop');
-              if (backdrop) backdrop.remove();
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Se actualizarán los datos de la receta.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, actualizar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        });
+    
+        if (result.isConfirmed) {
+            try {
+                // Determinar si la imagen cambió
+                const imageChanged = image !== selectedRecipe.image && 
+                                   !(typeof image === 'string' && image === selectedRecipe.image);
+    
+                // Preparar los datos según si hay imagen nueva o no
+                let dataToSend;
+                const payload = {
+                    name: title,
+                    process: process,
+                    serving_council: tips,
+                    ingredients: ingredients
+                        .filter(ing => ing.name.trim() !== "" && ing.quantity.trim() !== "")
+                        .map(ing => ({
+                            name: ing.name.replace('Ingrediente #', ''),
+                            quantity: parseFloat(ing.quantity) || 0
+                        }))
+                };
+    
+                
+                if (imageChanged && image instanceof File) {
+                    const formData = new FormData();
+                    Object.entries(payload).forEach(([key, value]) => {
+                        if (key === 'ingredients') {
+                            formData.append(key, JSON.stringify(value));
+                        } else {
+                            formData.append(key, value);
+                        }
+                    });
+                    formData.append('image', image);
+                    dataToSend = formData;
+                } 
+    
+                else {
+                    dataToSend = {
+                        ...payload,
+                        image: imageChanged ? image : null 
+                    };
+                }
+    
+               
+    
+                const response = await updateRecipe(selectedRecipe.id, dataToSend);
+    
+                if (!response || response.error) {
+                    throw new Error(response?.error || "Error al actualizar la receta");
+                }
+    
+                showSuccessToast({ title: "Receta actualizada", text: "¡Éxito!" });
+    
+                // Actualizar lista y cerrar modal
+                const freshRecipes = await getRecipes();
+                setRecipes(freshRecipes);
+                
+                const modal = document.getElementById('editRecipeModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) backdrop.remove();
+                }
+    
+            } catch (error) {
+                console.error("Error completo:", error.response?.data || error);
+                showErrorToast({
+                    title: "Error",
+                    text: error.response?.data?.message || 
+                         "Error al actualizar la receta. Verifica los datos."
+                });
             }
-            
-      
-      
-          } catch (error) {
-            console.error("Error en la actualización:", error);
-            
-            
-            let errorDetails = "Error desconocido";
-            if (error.response) {
-              errorDetails = `
-                Estado: ${error.response.status}
-                Mensaje: ${JSON.stringify(error.response.data, null, 2)}
-              `;
-            } else if (error.message) {
-              errorDetails = error.message;
-            }
-      
-            showErrorToast({ title: "Error", text: error.message || "Error al actualizar la receta." });
-          }
         }
-      };
+    };
 
     return (
         <div className="container pt-5 mt-4" style={{ paddingTop: '120px' }}>
@@ -188,7 +207,7 @@ const MyRecipes = () => {
                 <h1>Mis Recetas</h1>
                 <button className="btn btn-success" onClick={handleCreateRecipe}>Crear Receta</button>
             </div>
-            
+
             <div className="row">
                 {recipes.map(recipe => (
                     <div key={recipe.id} className="col-md-4 mb-4">
@@ -202,7 +221,7 @@ const MyRecipes = () => {
                             <div className="card-body">
                                 <h5 className="card-title">{recipe.name}</h5>
                                 <p className="card-text">{recipe.process}</p>
-                                
+
                                 <div className="d-flex justify-content-between">
                                     <button
                                         className="btn btn-primary"
@@ -238,28 +257,28 @@ const MyRecipes = () => {
                                 <div className="col-md-6">
                                     <div className="mb-3">
                                         <label className="form-label">Título</label>
-                                        <input 
-                                            type="text" 
-                                            className="form-control" 
-                                            value={title} 
-                                            onChange={(e) => setTitle(e.target.value)} 
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
                                         />
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label">Proceso</label>
-                                        <textarea 
-                                            className="form-control" 
+                                        <textarea
+                                            className="form-control"
                                             rows="5"
-                                            value={process} 
+                                            value={process}
                                             onChange={(e) => setProcess(e.target.value)}
                                         ></textarea>
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label">Consejos para Servir</label>
-                                        <textarea 
-                                            className="form-control" 
+                                        <textarea
+                                            className="form-control"
                                             rows="3"
-                                            value={tips} 
+                                            value={tips}
                                             onChange={(e) => setTips(e.target.value)}
                                         ></textarea>
                                     </div>
@@ -313,8 +332,8 @@ const MyRecipes = () => {
                                                 />
                                             </div>
                                             <div className="col-md-2 d-flex align-items-end">
-                                                <button 
-                                                    type="button" 
+                                                <button
+                                                    type="button"
                                                     className="btn btn-danger w-100"
                                                     onClick={() => handleRemoveIngredient(index)}
                                                 >
@@ -325,8 +344,8 @@ const MyRecipes = () => {
                                     </div>
                                 ))}
                             </div>
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 className="btn btn-primary mt-2"
                                 onClick={handleAddIngredient}
                             >

@@ -1,80 +1,27 @@
-import axios from 'axios';
-
-const getToken = () => localStorage.getItem('token');
+import { handleRequest } from '../../../config/http-client.gateway.js';
 
 export const getRecipes = async () => {
     try {
-        const token = getToken();
-        const response = await axios.get("http://localhost:8000/api/recipes/", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
+      const response = await handleRequest('get', 'recipes/');
+      return response.result || [];
     } catch (error) {
-        console.error("Error al obtener las recetas:", error.response?.status, error.response?.data);
-        throw error;
+      console.error("Error en getRecipes:", error);
+      return [];
     }
+  };
+
+
+export const updateRecipe = async (id, recipeData) => {
+  return await handleRequest('put', `/recipes/${id}/`, recipeData);
 };
 
-export const updateRecipe = async (recipeId, recipeData) => {
-    try {
-      const token = getToken();
-      const formData = new FormData();
-      
-  
-      formData.append('name', recipeData.name);
-      formData.append('process', recipeData.process);
-      formData.append('serving_council', recipeData.serving_council);
-      
-      
-      if (recipeData.image instanceof File) {
-        formData.append('image', recipeData.image);
-      } else if (typeof recipeData.image === 'string') {
-        
-      }
-      
-     
-      const ingredientsData = recipeData.ingredients.map(ing => ({
-        name: ing.name,
-        quantity: ing.quantity
-      }));
-      
-      formData.append('ingredients', JSON.stringify(ingredientsData));
-  
-      const response = await axios.put(
-        `http://localhost:8000/api/recipes/${recipeId}/`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      return response.data;
-    } catch (error) {
-      console.error("Error al actualizar receta:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        config: error.config
-      });
-      throw error;
-    }
-  };
+export const deleteRecipe = async (id) => {
+  return await handleRequest('delete', `/recipes/${id}/`);
+};
 
-  export const deleteRecipe = async (recipeId) => {
-    try {
-      const token = getToken();
-      await axios.delete(`http://localhost:8000/api/recipes/${recipeId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return true;
-    } catch (error) {
-      console.error("Error al eliminar receta:", error);
-      throw error;
-    }
-  };
+export const associateIngredients = async (recipeId, ingredients) => {
+  return await handleRequest('post', '/recipes/', {
+    recipe: recipeId,
+    ingredients: ingredients
+  });
+};

@@ -1,113 +1,52 @@
 import axios from 'axios';
+import { handleRequest } from '../../../config/http-client.gateway.js';
 
-// Obtener el token de localStorage
-const getToken = () => localStorage.getItem('token'); 
 
 // Función para obtener ingredientes existentes
+
 export const getIngredients = async () => {
   try {
-    const token = getToken();
-    const response = await axios.get("http://localhost:8000/api/recipes/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    return response.data;
+    const response = await handleRequest('get', '/recipes/');
+    return response.data; 
   } catch (error) {
-    console.error("Error al obtener los ingredientes:", error.response?.status, error.response?.data);
+    console.error("Error al obtener ingredientes:", error);
     throw error;
   }
 };
 
 
-// Función para crear un nuevo ingrediente
+// Crear ingrediente
 export const createIngredient = async (ingredientName, ingredientQuantity) => {
   try {
-    const token = getToken(); 
-    const response = await axios.post(
-      "http://localhost:8000/api/recipes/", 
-      {
-        name: ingredientName,
-        quantity: ingredientQuantity
-      },
-      {
-        headers: { 
-          Authorization: `Bearer ${token}` 
-        }
-      }
-    );
-    return response.data;
+    return await handleRequest('post', '/recipes/', {
+      name: ingredientName,
+      quantity: ingredientQuantity
+    });
   } catch (error) {
-    if (error.response) {
-      console.error("Detalles del error:", error.response.data);
-    } else {
-      console.error("Error al crear ingrediente:", error.message);
-    }
+    console.error("Error al crear ingrediente:", error);
     throw error;
   }
 };
 
-
-
-// Función para crear una receta
+// Crear receta
 export const createRecipe = async (formData) => {
-  try {
-    const token = getToken();  
-    const response = await axios.post(
-      "http://localhost:8000/api/recipes/",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,  
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error al crear receta:", error);
-    throw error;
-  }
+  return await handleRequest('post', '/recipes/', formData);
 };
 
-// Función para asociar ingredientes con la receta
+// Asociar ingredientes con receta
 export const associateIngredientsWithRecipe = async (recipeId, ingredients) => {
   try {
-    const token = getToken();  
     for (let ingredient of ingredients) {
-      await axios.post(
-        "http://localhost:8000/api/recipe_ingredients/",
-        {
-          recipe: recipeId,
-          ingredient: ingredient.id,
-          quantity: ingredient.quantity,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-          },
-        }
-      );
+      await handleRequest('post', '/recipe_ingredients/', {
+        recipe: recipeId,
+        ingredient: ingredient.id,
+        quantity: ingredient.quantity
+      });
     }
   } catch (error) {
-    console.error("Error al asociar ingredientes con la receta:", error);
+    console.error("Error al asociar ingredientes:", error);
     throw error;
   }
 };
 
-export const getRecipes = async () => {
-  try {
-    const token = getToken();
-    const response = await axios.get("http://localhost:8000/api/recipes/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error al obtener las recetas:", error.response?.status, error.response?.data);
-    throw error;
-  }
-};
 
