@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Sex
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,13 +7,15 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'name', 'sex', 'role', 'created_at']
         read_only_fields = ['id', 'created_at']
 
-class UserCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['email', 'password', 'name', 'sex', 'role']
-        extra_kwargs = {'password': {'write_only': True}}
+class RegisterUserDTO(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    name = serializers.CharField()
+    sex = serializers.ChoiceField(choices=Sex.choices)
 
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
+    def validate_email(self, value):
+        if User.objects.filter(email=value).first():
+            raise serializers.ValidationError("Este correo ya esta registrado")
+
+        return value
 
