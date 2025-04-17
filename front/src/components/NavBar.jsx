@@ -48,7 +48,6 @@ const NavBar = ({ isAdmin }) => {
                             </>
                         ) : (
                             <>
-                                <NavDropdown.Item href="/">Crear Receta</NavDropdown.Item>
                                 <NavDropdown.Item href="/myrecipes">Mis Recetas</NavDropdown.Item>
                                 <NavDropdown.Item href="/">Comentarios Realizados</NavDropdown.Item>
                                 <NavDropdown.Item href="/">Calificaciones Realizadas</NavDropdown.Item>

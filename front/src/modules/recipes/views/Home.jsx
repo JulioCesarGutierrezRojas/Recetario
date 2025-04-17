@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router";
 import { useEffect, useState } from 'react';
-import { getRecipes } from '../controller/controllerMyrecipes';
+import { getAllRecipes } from '../controller/controllerHome';
 
 const Home = () => {
 
@@ -16,7 +16,7 @@ const Home = () => {
     
     useEffect(() => {
         const fetchRecipes = async () => {
-            const data = await getRecipes();
+            const data = await getAllRecipes();
             setCards(data); 
         };
 
