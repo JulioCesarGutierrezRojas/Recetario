@@ -37,7 +37,9 @@ const MyRecipes = () => {
         navigate("/recipeform");
     };
 
-
+    const handleBackHome = () => {
+        navigate("/home");
+    };
 
     const handleEditRecipe = async (recipe) => {
         console.log("Recipe data received:", recipe); // Para depuración
@@ -205,7 +207,10 @@ const MyRecipes = () => {
         <div className="container pt-5 mt-4" style={{ paddingTop: '120px' }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h1>Mis Recetas</h1>
-                <button className="btn btn-success" onClick={handleCreateRecipe}>Crear Receta</button>
+                <div className="d-flex gap-2">
+                    <button className="btn btn-secondary" onClick={handleCreateRecipe}>Crear Receta</button>
+                    <button className="btn btn-secondary" onClick={handleBackHome}>Regresar al Menú</button>
+                </div>
             </div>
 
             <div className="row">
