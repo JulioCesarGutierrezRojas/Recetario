@@ -19,7 +19,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return context
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        user_param = self.request.query_params.get('user')
+
+        if user_param == 'me':
+            return self.queryset.filter(user=self.request.user)
+
+        if user_param:
+            return self.queryset.filter(user_id=user_param)
+
+        return self.queryset  # todas las recetas
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
