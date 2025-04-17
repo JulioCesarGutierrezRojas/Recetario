@@ -1,10 +1,24 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import mixins, viewsets, generics, status
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import User, Role
-from .serializers import RegisterUserDTO
+from .serializers import UserSerializer, RegisterUserDTO
+
+# Vista para ver, editar, eliminar usuarios (requiere autenticación)
+class UserViewSet(mixins.ListModelMixin,       # GET /users/
+                  mixins.RetrieveModelMixin,   # GET /users/{id}/
+                  mixins.UpdateModelMixin,     # PUT/PATCH /users/{id}/
+                  mixins.DestroyModelMixin,    # DELETE /users/{id}/
+                  viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'put', 'patch', 'delete']
+
+    def get_serializer_class(self):
+        return UserSerializer
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -16,16 +30,6 @@ def register_user(request):
             return Response({'error': user.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         User.objects.create_user(**user.validated_data, role=Role.USER)
-
-        """
-        User.objects.create_user(
-            email = user.validated_data['email'],
-            password = user.validated_data['password'],
-            name = user.validated_data['name'],
-            sex = user.validated_data['sex'],
-            role = Role.USER
-        )
-        """
 
         return Response({'message': 'Usuario creado exitosamente'}, status=status.HTTP_201_CREATED)
     except Exception as e:

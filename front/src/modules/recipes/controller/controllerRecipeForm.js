@@ -1,60 +1,52 @@
 import axios from 'axios';
+import { handleRequest } from '../../../config/http-client.gateway.js';
 
 
 // Función para obtener ingredientes existentes
+
 export const getIngredients = async () => {
   try {
-    const response = await axios.get("http://localhost:8000/api/ingredients/");
-    return response.data;
+    const response = await handleRequest('get', '/recipes/');
+    return response.data; 
   } catch (error) {
-    console.error("Error al obtener los ingredientes:", error);
+    console.error("Error al obtener ingredientes:", error);
     throw error;
   }
 };
 
 
-// Función para crear un nuevo ingrediente
-export const createIngredient = async (ingredientName) => {
+// Crear ingrediente
+export const createIngredient = async (ingredientName, ingredientQuantity) => {
   try {
-    const response = await axios.post("http://localhost:8000/api/ingredients/", {
+    return await handleRequest('post', '/recipes/', {
       name: ingredientName,
+      quantity: ingredientQuantity
     });
-    return response.data;
   } catch (error) {
     console.error("Error al crear ingrediente:", error);
     throw error;
   }
 };
 
-
-// Función para crear una receta
+// Crear receta
 export const createRecipe = async (formData) => {
-  try {
-    const response = await axios.post(
-      "http://localhost:8000/api/recipes/",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error al crear receta:", error);
-    throw error;
-  }
+  return await handleRequest('post', '/recipes/', formData);
 };
 
-
-// Función para asociar ingredientes con la receta
+// Asociar ingredientes con receta
 export const associateIngredientsWithRecipe = async (recipeId, ingredients) => {
   try {
     for (let ingredient of ingredients) {
-      await axios.post("http://localhost:8000/api/recipe_ingredients/", {
+      await handleRequest('post', '/recipe_ingredients/', {
         recipe: recipeId,
         ingredient: ingredient.id,
-        quantity: ingredient.quantity,
+        quantity: ingredient.quantity
       });
     }
   } catch (error) {
-    console.error("Error al asociar ingredientes con la receta:", error);
+    console.error("Error al asociar ingredientes:", error);
     throw error;
   }
 };
+
+

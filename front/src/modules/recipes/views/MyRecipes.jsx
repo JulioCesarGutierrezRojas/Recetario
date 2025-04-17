@@ -4,9 +4,12 @@ import { useNavigate } from "react-router";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { showErrorToast, showSuccessToast } from "../../../kernel/alerts";
+import { getRecipes, updateRecipe, deleteRecipe } from "../controller/controllerMyrecipes";
 
 
 const MyRecipes = () => {
+
     const navigate = useNavigate();
     const [recipes, setRecipes] = useState([]);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -14,18 +17,19 @@ const MyRecipes = () => {
     const [process, setProcess] = useState('');
     const [tips, setTips] = useState('');
     const [image, setImage] = useState(null);
-    const [ingredients, setIngredients] = useState([{ ingredient: "", quantity: "" }]);
+    const [ingredients, setIngredients] = useState([{ name: "", quantity: "" }]);
 
     useEffect(() => {
         const fetchRecipes = async () => {
             try {
-                const response = await axios.get("http://localhost:8000/api/recipes/");
-                setRecipes(response.data);
+                const response = await getRecipes();
+                const recipesData = Array.isArray(response) ? response : [];
+                setRecipes(recipesData);
             } catch (error) {
-                console.error("Error al obtener las recetas:", error);
+                console.error("Error al cargar recetas:", error);
+                setRecipes([]);
             }
         };
-
         fetchRecipes();
     }, []);
 
@@ -33,17 +37,59 @@ const MyRecipes = () => {
         navigate("/recipeform");
     };
 
-    const handleEditRecipe = (recipe) => {
+    const handleBackHome = () => {
+        navigate("/home");
+    };
+
+    const handleEditRecipe = async (recipe) => {
+        console.log("Recipe data received:", recipe); // Para depuración
+        
         setSelectedRecipe(recipe);
         setTitle(recipe.name);
         setProcess(recipe.process);
         setTips(recipe.serving_council);
-        setIngredients(recipe.ingredients || [{ ingredient: "", quantity: "" }]);
-        setImage(null); // Resetear la imagen al editar
+    
+        let mappedIngredients = [];
+    
+        if (recipe.recipe_ingredients?.length > 0) {
+            mappedIngredients = recipe.recipe_ingredients.map(item => {
+                console.log("Current ingredient item:", item); // Para depuración
+                return {
+                    name: item.ingredient?.name || item.ingredient || "",
+                    quantity: item.quantity || "",
+                    id: item.id || undefined
+                };
+            });
+        } else {
+            mappedIngredients = [{ name: "", quantity: "" }];
+        }
+    
+        console.log("Mapped ingredients:", mappedIngredients); // Para ver el resultado
+        setIngredients(mappedIngredients);
+        setImage(recipe.image);
+    };
+    
+    const handleIngredientChange = (index, event) => {
+        const newIngredients = [...ingredients];
+        newIngredients[index][event.target.name] = event.target.value;
+        setIngredients(newIngredients);
+    };
+
+    const handleAddIngredient = () => {
+        setIngredients([...ingredients, { name: "", quantity: "" }]);
+    };
+
+    const handleRemoveIngredient = (index) => {
+        setIngredients(ingredients.filter((_, i) => i !== index));
+    };
+
+    const handleImageChange = (event) => {
+        if (event.target.files?.[0]) {
+            setImage(event.target.files[0]);
+        }
     };
 
     const handleDeleteRecipe = async (id) => {
-        // Mostrar SweetAlert para confirmar la eliminación
         const result = await Swal.fire({
             title: '¿Estás seguro?',
             text: "¡Esta receta será eliminada permanentemente!",
@@ -53,51 +99,21 @@ const MyRecipes = () => {
             cancelButtonText: 'Cancelar',
             reverseButtons: true
         });
-    
+
         if (result.isConfirmed) {
             try {
-                const response = await axios.delete(`http://localhost:8000/api/recipes/${id}/`);
-                if (response.status === 204) { // HTTP 204 significa "No Content", eliminación exitosa
-                    setRecipes(recipes.filter(recipe => recipe.id !== id));
-                    Swal.fire(
-                        'Eliminado!',
-                        'La receta ha sido eliminada.',
-                        'success'
-                    );
+                const response = await deleteRecipe(id);
+
+                if (response.type === 'SUCCESS') {
+                    setRecipes(prev => prev.filter(recipe => recipe.id !== id));
+                    showSuccessToast({ title: "Receta eliminada", text: "¡Éxito!" });
                 } else {
-                    console.error('Error al eliminar la receta:', response.data);
+                    throw new Error(response.text);
                 }
             } catch (error) {
-                console.error("Error al eliminar la receta:", error.response ? error.response.data : error.message);
-                Swal.fire(
-                    'Error!',
-                    'Hubo un error al eliminar la receta.',
-                    'error'
-                );
+                showErrorToast({ title: "Error", text: error.message || "Error al eliminar la receta." });
             }
-        } else {
-            console.log("Eliminación cancelada.");
         }
-    };
-    
-    
-
-    const handleIngredientChange = (index, event) => {
-        const newIngredients = [...ingredients];
-        newIngredients[index][event.target.name] = event.target.value;
-        setIngredients(newIngredients);
-    };
-
-    const handleAddIngredient = () => {
-        setIngredients([...ingredients, { ingredient: "", quantity: "" }]);
-    };
-
-    const handleRemoveIngredient = (index) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
-    };
-
-    const handleImageChange = (event) => {
-        setImage(event.target.files[0]);
     };
 
     const handleSaveEdit = async () => {
@@ -115,72 +131,102 @@ const MyRecipes = () => {
     
         if (result.isConfirmed) {
             try {
-                const formData = new FormData();
-                formData.append("name", title);
-                formData.append("process", process);
-                formData.append("serving_council", tips);
-                if (image) {
-                    formData.append("image", image);
+                // Determinar si la imagen cambió
+                const imageChanged = image !== selectedRecipe.image && 
+                                   !(typeof image === 'string' && image === selectedRecipe.image);
+    
+                // Preparar los datos según si hay imagen nueva o no
+                let dataToSend;
+                const payload = {
+                    name: title,
+                    process: process,
+                    serving_council: tips,
+                    ingredients: ingredients
+                        .filter(ing => ing.name.trim() !== "" && ing.quantity.trim() !== "")
+                        .map(ing => ({
+                            name: ing.name.replace('Ingrediente #', ''),
+                            quantity: parseFloat(ing.quantity) || 0
+                        }))
+                };
+    
+                
+                if (imageChanged && image instanceof File) {
+                    const formData = new FormData();
+                    Object.entries(payload).forEach(([key, value]) => {
+                        if (key === 'ingredients') {
+                            formData.append(key, JSON.stringify(value));
+                        } else {
+                            formData.append(key, value);
+                        }
+                    });
+                    formData.append('image', image);
+                    dataToSend = formData;
+                } 
+    
+                else {
+                    dataToSend = {
+                        ...payload,
+                        image: imageChanged ? image : null 
+                    };
                 }
     
-                // Actualizar receta
-                await axios.put(`http://localhost:8000/api/recipes/${selectedRecipe.id}/`, formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+               
     
-                // Actualizar o agregar ingredientes
-                await Promise.all(
-                    ingredients.map(async (ingredient) => {
-                        if (!ingredient.ingredient || !ingredient.quantity) return;
+                const response = await updateRecipe(selectedRecipe.id, dataToSend);
     
-                        if (ingredient.id) {
-                            // Actualizar ingrediente existente
-                            await axios.put(`http://localhost:8000/api/ingredients/${ingredient.id}/`, {
-                                name: ingredient.ingredient,
-                                quantity: ingredient.quantity,
-                            });
-                        } else {
-                            // Crear nuevo ingrediente
-                            await axios.post(`http://localhost:8000/api/ingredients/`, {
-                                name: ingredient.ingredient,
-                                quantity: ingredient.quantity,
-                                recipe: selectedRecipe.id,
-                            });
-                        }
-                    })
-                );
+                if (!response || response.error) {
+                    throw new Error(response?.error || "Error al actualizar la receta");
+                }
     
-                Swal.fire("¡Éxito!", "Receta actualizada correctamente.", "success");
+                showSuccessToast({ title: "Receta actualizada", text: "¡Éxito!" });
     
-                // Refrescar la lista de recetas después de editar
-                const response = await axios.get("http://localhost:8000/api/recipes/");
-                setRecipes(response.data);
+                // Actualizar lista y cerrar modal
+                const freshRecipes = await getRecipes();
+                setRecipes(freshRecipes);
+                
+                const modal = document.getElementById('editRecipeModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) backdrop.remove();
+                }
     
             } catch (error) {
-                console.error("Error al actualizar la receta:", error.response?.data || error);
-                Swal.fire("Error", "No se pudo actualizar la receta.", "error");
+                console.error("Error completo:", error.response?.data || error);
+                showErrorToast({
+                    title: "Error",
+                    text: error.response?.data?.message || 
+                         "Error al actualizar la receta. Verifica los datos."
+                });
             }
-        } else {
-            console.log("Actualización cancelada.");
         }
     };
-    
-    
 
     return (
-        <div className="container mt-4" style={{ paddingTop: '80px' }}>
+        <div className="container pt-5 mt-4" style={{ paddingTop: '120px' }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h1>Mis Recetas</h1>
-                <button className="btn btn-success" onClick={handleCreateRecipe}>Crear Receta</button>
+                <div className="d-flex gap-2">
+                    <button className="btn btn-secondary" onClick={handleCreateRecipe}>Crear Receta</button>
+                    <button className="btn btn-secondary" onClick={handleBackHome}>Regresar al Menú</button>
+                </div>
             </div>
+
             <div className="row">
                 {recipes.map(recipe => (
                     <div key={recipe.id} className="col-md-4 mb-4">
                         <div className="card shadow-sm">
+                            <img
+                                src={recipe.image}
+                                alt={recipe.name}
+                                className="card-img-top"
+                                style={{ height: "200px", objectFit: "cover" }}
+                            />
                             <div className="card-body">
                                 <h5 className="card-title">{recipe.name}</h5>
-                                <img src={recipe.image} alt={recipe.name} className="card-img-top" />
-                                <p className="card-text">{recipe.description}</p>
+                                <p className="card-text">{recipe.process}</p>
+
                                 <div className="d-flex justify-content-between">
                                     <button
                                         className="btn btn-primary"
@@ -190,7 +236,12 @@ const MyRecipes = () => {
                                     >
                                         Editar
                                     </button>
-                                    <button className="btn btn-danger" onClick={() => handleDeleteRecipe(recipe.id)}>Eliminar</button>
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={() => handleDeleteRecipe(recipe.id)}
+                                    >
+                                        Eliminar
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -198,53 +249,119 @@ const MyRecipes = () => {
                 ))}
             </div>
 
-            {/* Modal de edición de receta */}
+            {/* Modal de edición */}
             <div className="modal fade" id="editRecipeModal" tabIndex="-1" aria-labelledby="editRecipeModalLabel" aria-hidden="true">
-                <div className="modal-dialog">
+                <div className="modal-dialog modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" id="editRecipeModalLabel">Editar Receta</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <div className="mb-3">
-                                <label className="form-label">Título</label>
-                                <input type="text" className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Proceso</label>
-                                <textarea className="form-control" value={process} onChange={(e) => setProcess(e.target.value)}></textarea>
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Consejos para Servir</label>
-                                <textarea className="form-control" value={tips} onChange={(e) => setTips(e.target.value)}></textarea>
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Imagen de la Receta</label>
-                                <input type="file" className="form-control" onChange={handleImageChange} />
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <div className="mb-3">
+                                        <label className="form-label">Título</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Proceso</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="5"
+                                            value={process}
+                                            onChange={(e) => setProcess(e.target.value)}
+                                        ></textarea>
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Consejos para Servir</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="3"
+                                            value={tips}
+                                            onChange={(e) => setTips(e.target.value)}
+                                        ></textarea>
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="mb-3">
+                                        <label className="form-label">Imagen de la Receta</label>
+                                        {image && (
+                                            <img
+                                                src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+                                                alt="Vista previa"
+                                                className="img-fluid mb-2 rounded"
+                                                style={{ maxHeight: "200px" }}
+                                            />
+                                        )}
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
-                            <h4>Ingredientes</h4>
-                            {ingredients.map((ingredient, index) => (
-                                <div key={index} className="mb-3">
-                                    <div className="d-flex justify-content-between">
-                                        <div className="w-50">
-                                            <label className="form-label">Ingrediente</label>
-                                            <input type="text" className="form-control" name="ingredient" value={ingredient.ingredient} onChange={(e) => handleIngredientChange(index, e)} />
-                                        </div>
-                                        <div className="w-50">
-                                            <label className="form-label">Cantidad</label>
-                                            <input type="text" className="form-control" name="quantity" value={ingredient.quantity} onChange={(e) => handleIngredientChange(index, e)} />
+                            <h4 className="mt-4">Ingredientes</h4>
+                            <div className="ingredients-container">
+                                {ingredients.map((ingredient, index) => (
+                                    <div key={index} className="mb-3 p-3 border rounded">
+                                        <div className="row g-2">
+                                            <div className="col-md-6">
+                                                <label className="form-label">Nombre del Ingrediente</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="name"
+                                                    value={ingredient.name}
+                                                    onChange={(e) => handleIngredientChange(index, e)}
+                                                    placeholder="Ej: Harina"
+                                                />
+                                            </div>
+                                            <div className="col-md-4">
+                                                <label className="form-label">Cantidad</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="quantity"
+                                                    value={ingredient.quantity}
+                                                    onChange={(e) => handleIngredientChange(index, e)}
+                                                    placeholder="Ej: 200g"
+                                                />
+                                            </div>
+                                            <div className="col-md-2 d-flex align-items-end">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger w-100"
+                                                    onClick={() => handleRemoveIngredient(index)}
+                                                >
+                                                    <i className="bi bi-trash"></i> Eliminar
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <button type="button" className="btn btn-danger" onClick={() => handleRemoveIngredient(index)}>Eliminar ingrediente</button>
-                                </div>
-                            ))}
-                            <button type="button" className="btn btn-primary" onClick={handleAddIngredient}>Agregar Ingrediente</button>
+                                ))}
+                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-primary mt-2"
+                                onClick={handleAddIngredient}
+                            >
+                                <i className="bi bi-plus"></i> Agregar Ingrediente
+                            </button>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>Guardar cambios</button>
+                            <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>
+                                Guardar Cambios
+                            </button>
                         </div>
                     </div>
                 </div>
