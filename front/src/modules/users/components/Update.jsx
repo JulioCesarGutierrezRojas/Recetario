@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { UserController } from '../adapters/controller';
 import {showSuccessToast, showErrorToast, showConfirmation} from '../../../kernel/alerts';
+import Loader from '../../../components/Loader';
 
 export const Update = ({ initialData, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     id: '',
     name: '',
@@ -17,6 +19,7 @@ export const Update = ({ initialData, onSuccess }) => {
   }, [initialData]);
 
   const handleUpdate = async () => {
+    setLoading(true);
     try {
       const { id, name, email, sex } = formData;
       const payload = { name, email, sex };
@@ -34,6 +37,8 @@ export const Update = ({ initialData, onSuccess }) => {
         title: 'Error',
         text: errorMsg
       });
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -50,6 +55,7 @@ export const Update = ({ initialData, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <Loader isLoading={loading} />
       <div className="mb-3">
         <label className="form-label">Nombre:</label>
         <input

@@ -3,10 +3,12 @@ import { UserController } from "../adapters/controller";
 import {
   showAlertWithoutCancel,
   showConfirmation,
-  showSuccessToast,
-} from "../../../kernel/alerts";
+  showSuccessToast,} from "../../../kernel/alerts";
+import Loader from "../../../components/Loader";
 
 export const Register = ({ onSuccess }) => {
+  
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -47,6 +49,7 @@ export const Register = ({ onSuccess }) => {
   };
 
   const onSubmit = async (e) => {
+    setLoading(true);
     try {
       const payload = {
         email: formData.email,
@@ -73,11 +76,14 @@ export const Register = ({ onSuccess }) => {
         "error"
       );
       resetForm();
+    }finally {
+      setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      <Loader isLoading={loading} />
       <div className="mb-3">
         <label className="form-label">Nombre:</label>
         <input

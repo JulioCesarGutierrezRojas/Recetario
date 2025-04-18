@@ -11,7 +11,7 @@ import { UserList } from "../modules/users/views/UserList";
 
 const AppRouter = () => {
     const location = useLocation();
-    const isAdmin = localStorage.getItem("role") === "admin";
+    const isAdmin = localStorage.getItem("role") === "Administrador";
 
     const hiddenNavBar = ['/', '/signup', '/forgot-password'];
 

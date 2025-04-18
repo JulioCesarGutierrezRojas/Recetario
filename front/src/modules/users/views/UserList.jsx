@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { UserController } from '../adapters/controller';
 import Modal from '../components/Modal';
 import DataTable from "react-data-table-component";
-import { Trash, Edit, Trash2 } from 'react-feather';
+import { Edit, Trash2 } from 'react-feather';
 import {showWarningToast, showConfirmation, showSuccessToast} from '../../../kernel/alerts';
+import Loader from '../../../components/Loader';
 
 
 
@@ -14,12 +15,15 @@ export const UserList = () => {
   const [loading, setLoading] = useState(false);
 
     const fetchUsers = async () => {
+    setLoading(true);
     try {
       const data = await UserController.getUsers();
       console.log(data);
       setUsers(data.result);
     } catch (error) {
       console.error('Error fetching users:', error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -107,6 +111,7 @@ export const UserList = () => {
 
   return (
     <div className="container mt-5">
+      <Loader isLoading={loading} />
       <div className="d-flex justify-content-between align-items-center mb-5">
         <h1 className="display-5 text-success mt-5">Lista de Usuarios</h1>
         <button 
