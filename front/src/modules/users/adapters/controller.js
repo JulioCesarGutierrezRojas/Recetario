@@ -7,5 +7,6 @@ export const UserController = {
 
     async createUser(payload) {
         return await handleRequest('post', '/users', payload);
-    }  
+    },
+    
 };
