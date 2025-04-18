@@ -1,11 +1,9 @@
 import { Register } from "../components/Register";
-
+import { Update } from "../components/Update";
 
 const Modal = ({ showModal, setShowModal, selectedUser, fetchUsers }) => {
   return (
-    <div
-      className={`modal ${showModal ? "show d-block" : "d-none"}`}
-      tabIndex="-1">
+    <div className={`modal ${showModal ? "show d-block" : "d-none"}`} tabIndex="-1">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -19,14 +17,22 @@ const Modal = ({ showModal, setShowModal, selectedUser, fetchUsers }) => {
             ></button>
           </div>
           <div className="modal-body">
-            <Register
-              initialData={selectedUser}
-              onSuccess={() => {
-                setShowModal(false);
-                fetchUsers();
-              }}
-              isEditing={!!selectedUser}
-            />
+            {selectedUser ? (
+              <Update
+                initialData={selectedUser}
+                onSuccess={() => {
+                  setShowModal(false);
+                  fetchUsers();
+                }}
+              />
+            ) : (
+              <Register
+                onSuccess={() => {
+                  setShowModal(false);
+                  fetchUsers();
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

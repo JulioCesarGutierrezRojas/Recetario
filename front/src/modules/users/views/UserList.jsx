@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-/*import { UserController } from '../adapters/controller';*/
+import { UserController } from '../adapters/controller';
 import Modal from '../components/Modal';
 import DataTable from "react-data-table-component";
 import { Trash, Edit, Trash2 } from 'react-feather';
-import {showAlert, showConfirmation} from '../../../kernel/alerts';
+import {showWarningToast, showConfirmation, showSuccessToast} from '../../../kernel/alerts';
 
 
 
@@ -11,120 +11,43 @@ export const UserList = () => {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const fetchUsers = async () => {
-    const fakeUsers = [
-      {
-        id: 1,
-        name: 'Ana Torres',
-        email: 'ana.torres@example.com',
-        sex: 'Femenino',
-        start: '2023-01-10',
-        type: 'Administrador',
-      },
-      {
-        id: 2,
-        name: 'Carlos Gómez',
-        email: 'carlos.gomez@example.com',
-        sex: 'Masculino',
-        start: '2022-11-05',
-        type: 'Empleado',
-      },
-      {
-        id: 3,
-        name: 'Laura Méndez',
-        email: 'laura.mendez@example.com',
-        sex: 'Femenino',
-        start: '2021-08-20',
-        type: 'Usuario',
-      },
-      {
-        id: 4,
-        name: 'Pedro Castillo',
-        email: 'pedro.castillo@example.com',
-        sex: 'Masculino',
-        start: '2020-02-14',
-        type: 'Empleado',
-      },
-      {
-        id: 5,
-        name: 'María Fernanda',
-        email: 'maria.fernanda@example.com',
-        sex: 'Femenino',
-        start: '2019-07-30',
-        type: 'Administrador',
-      },
-      {
-        id: 6,
-        name: 'Jorge Martínez',
-        email: 'jorge.martinez@example.com',
-        sex: 'Masculino',
-        start: '2023-03-01',
-        type: 'Usuario',
-      },
-      {
-        id: 7,
-        name: 'Sofía Reyes',
-        email: 'sofia.reyes@example.com',
-        sex: 'Femenino',
-        start: '2022-10-12',
-        type: 'Empleado',
-      },
-      {
-        id: 8,
-        name: 'Luis Ortega',
-        email: 'luis.ortega@example.com',
-        sex: 'Masculino',
-        start: '2021-06-25',
-        type: 'Administrador',
-      },
-      {
-        id: 9,
-        name: 'Claudia López',
-        email: 'claudia.lopez@example.com',
-        sex: 'Femenino',
-        start: '2020-09-17',
-        type: 'Usuario',
-      },
-      {
-        id: 10,
-        name: 'Fernando Ruiz',
-        email: 'fernando.ruiz@example.com',
-        sex: 'Masculino',
-        start: '2018-12-05',
-        type: 'Empleado',
-      },
-      {
-        id: 11,
-        name: 'chiwis ',
-        email: 'chiwis@example.com',
-        sex: 'Masculino',
-        start: '2018-12-05',
-        type: 'Empleado',
-      },
-    ];
-    setUsers(fakeUsers);
-  };
-  
-  /*const fetchUsers = async () => {
+    const fetchUsers = async () => {
     try {
       const data = await UserController.getUsers();
-      setUsers(data);
+      console.log(data);
+      setUsers(data.result);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
-  };*/
+  };
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  const handleDelete =  (id) => {/* poner el async await una vez que se conecte ok*/
-     showConfirmation('Eliminacion de usuario', '¿Seguro que quieres eliminar este usuario?', 'warning' , onDelete)
+  const handleDelete = (id) => {
+    showConfirmation(
+      'Eliminación de usuario',
+      '¿Seguro que quieres eliminar este usuario?',
+      'warning',
+      () => onDelete(id)
+    );
   };
-  const onDelete =  (id) => {
-    /*en esta se va a cambiar cuando este el back, try se manda el spinner... catch imprimir alerta de error y finally terminar el spinner*/
-     showAlert('Eliminado', 'Usuario eliminado correctamente', 'success');
+  
+
+  const onDelete = async(id) => {
+    setLoading(true);
+    try {
+      await UserController.deleteUser(id);
+      showSuccessToast({ title: 'Usuario eliminado', text: 'El usuario ha sido eliminado correctamente' });
+    } catch (error) {
+      showWarningToast({ title: 'Error', text: error.message });
+    } finally {
+      setLoading(false);
+      fetchUsers();
+    }
   }
 
   const columns = [
@@ -145,12 +68,12 @@ export const UserList = () => {
     },
     {
       name: <span className="fw-bold text-primary fs-5">Inicio</span>,
-      selector: (row) => new Date(row.start).toLocaleDateString(),
+      selector: (row) => new Date(row.created_at).toLocaleDateString(),
       sortable: true,
     },
     {
       name: <span className="fw-bold text-primary fs-5">Tipo</span>,
-      selector: (row) => row.type,
+      selector: (row) => row.role,
       sortable: true,
     },
     {
@@ -192,8 +115,7 @@ export const UserList = () => {
             setSelectedUser(null);
             setShowModal(true);
           }}
-        >
-          <i className="bi bi-plus-circle me-2"></i>Nuevo Usuario
+        ><i className="bi bi-plus-circle me-2"></i>Nuevo Usuario
         </button>
       </div>
 

@@ -1,33 +1,78 @@
-import { useState, useEffect } from 'react';
-/*import { UserController } from '../adapters/controller';**/
+import { useState } from "react";
+import { UserController } from "../adapters/controller";
+import {
+  showAlertWithoutCancel,
+  showConfirmation,
+  showSuccessToast,
+} from "../../../kernel/alerts";
 
-export const Register = ({ initialData, onSuccess, isEditing = false }) => {
+export const Register = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    sex: '',
-    start: '', 
-    type: ''
+    name: "",
+    email: "",
+    sex: "",
+    password: "",
+    passwordConfirm: "",
+    role: "",
   });
 
-  useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
-    }
-  }, [initialData]);
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      email: "",
+      sex: "",
+      password: "",
+      passwordConfirm: "",
+      role: "",
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.passwordConfirm) {
+      showAlertWithoutCancel(
+        "Contraseñas no coinciden",
+        "Por favor verifica que ambas contraseñas sean iguales",
+        "error"
+      );
+      return;
+    }
+    showConfirmation(
+      "¿Está seguro de registrar este usuario?",
+      "Esta acción agregará el usuario al sistema",
+      "warning",
+      () => onSubmit(e)
+    );
+  };
+
+  const onSubmit = async (e) => {
     try {
-      if (formData.id) {
-        await UserController.updateUser(formData.id, formData);
-      } else {
-        await UserController.createUser(formData);
-      }
+      const payload = {
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        sex: formData.sex,
+        role: formData.role,
+      };
+
+      await UserController.createUser(payload);
+
+      showSuccessToast({
+        title: "Usuario Agregado",
+        text: "El usuario ha sido agregado correctamente",
+      });
+      console.log("SUCCESS");
       onSuccess();
+      resetForm();
     } catch (error) {
-      console.error('Error saving user:', error);
+      console.error("Error al registrar usuario:", error);
+      showAlertWithoutCancel(
+        "Error al registrar",
+        "Hubo un problema al agregar el usuario",
+        "error"
+      );
+      resetForm();
     }
   };
 
@@ -55,56 +100,64 @@ export const Register = ({ initialData, onSuccess, isEditing = false }) => {
         />
       </div>
 
-      {!formData.id && (
-        <div className="mb-3">
-          <label className="form-label">Contraseña:</label>
-          <input
-            type="password"
-            className="form-control"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required disabled
-          />
-        </div>
-      )}
-
-<div className="mb-3">
+      <div className="mb-3">
         <label>Sexo</label>
         <select
           className="form-control"
           value={formData.sex}
-          onChange={(e) => setFormData({...formData, sex: e.target.value})}
-          disabled></select>
-      </div>
-
-      <div className="mb-3">
-        <label>Fecha de Registro</label>
-        <input
-          type="date"
-          className="form-control"
-          value={formData.start.split('T')[0]}
-          disabled
-        />
+          onChange={(e) => setFormData({ ...formData, sex: e.target.value })}
+          required
+        >
+          <option value="">Selecciona tu género</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
       </div>
 
       <div className="mb-3">
         <label>Tipo de Usuario</label>
         <select
           className="form-control"
-          value={formData.type}
-          onChange={(e) => setFormData({...formData, type: e.target.value})}
-          disabled
+          value={formData.role}
+          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          required
         >
-          <option value="admin">Administrador</option>
-          <option value="usuario">Usuario</option>
+          <option value="">Selecciona</option>
+          <option value="Administrador">Administrador</option>
+          <option value="Usuario">Usuario</option>
         </select>
       </div>
 
-      <div className="d-grid gap-2">
-        <button type="submit" className="btn btn-blue">
-          {formData.id ? 'Actualizar Usuario' : 'Registrar Usuario'}
-        </button>
+      <div className="mb-3">
+        <label>Contraseña</label>
+        <input
+          type="password"
+          className="form-control"
+          value={formData.password}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
+          required
+        />
       </div>
+
+      <div className="mb-3">
+        <label>Confirmar Contraseña</label>
+        <input
+          type="password"
+          className="form-control"
+          value={formData.passwordConfirm}
+          onChange={(e) =>
+            setFormData({ ...formData, passwordConfirm: e.target.value })
+          }
+          required
+        />
+      </div>
+
+      <button type="submit" className="btn btn-secondary w-100">
+        Registrar Usuario
+      </button>
     </form>
   );
 };

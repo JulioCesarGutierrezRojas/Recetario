@@ -1,12 +1,27 @@
 import { handleRequest } from "../../../config/http-client.gateway";
 
 export const UserController = {
-    async getUsers() {
-        return await handleRequest('get', '/users');
-    },
+  // obtenerlos
+  async getUsers() {
+    return await handleRequest('get', '/users');
+  },
 
-    async createUser(payload) {
-        return await handleRequest('post', '/users', payload);
-    },
-    
+  // crear 
+  async createUser(payload) {
+    const response = await handleRequest('post', '/users/register/', payload);
+    if (response.type !== 'SUCCESS')
+      throw new Error("Error al crear el usuario: ");
+    console.log("desde el controller", response);
+  return response;
+  },
+
+  // actualizar 
+  async updateUser(id, payload) {
+    return await handleRequest('put', `/users/${id}/`, payload);
+  },
+
+  // elimineishon
+  async deleteUser(id) {
+    return await handleRequest('delete', `/users/${id}/`);
+  }
 };
