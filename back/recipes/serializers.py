@@ -10,7 +10,8 @@ class IngredientSerializer(serializers.ModelSerializer):
         extra_kwargs = { 'name': { 'validators': [] } }
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    ingredient = serializers.CharField()
+    ingredient = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    #linea anterior: ingredient = IngredientSerializer()
 
     class Meta:
         model = Recipe_Ingredient
