@@ -1,8 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from "react-router";
 import { useEffect, useState } from 'react';
-import { getAllRecipes } from '../controller/controllerHome';
+import { getAllRecipes, getAllRatings } from '../controller/controllerHome';
 
 const Home = () => {
 
@@ -15,12 +16,26 @@ const Home = () => {
 
     
     useEffect(() => {
-        const fetchRecipes = async () => {
-            const data = await getAllRecipes();
-            setCards(data); 
+        const fetchData = async () => {
+          const [recipes, ratings] = await Promise.all([
+            getAllRecipes(),
+            getAllRatings()
+          ]);
+          console.log("Ratings:", ratings);
+      
+          const recipesWithRatings = recipes.map(recipe => {
+            const recipeRatings = ratings.filter(r => r.recipe_id === recipe.id);
+            const avgRating = recipeRatings.length
+                ? (recipeRatings.reduce((sum, r) => sum + r.calification, 0) / recipeRatings.length).toFixed(1)
+                : "Sin calificación";
+            
+            return { ...recipe, avgRating };
+          });
+      
+          setCards(recipesWithRatings);
         };
-
-        fetchRecipes();
+      
+        fetchData();
     }, []);
 
 
@@ -70,6 +85,15 @@ const Home = () => {
                                 <img src={card.image} className="card-img-top" alt={card.name} style={{ height: "300px", objectFit: "cover" }} />
                                 <div className="card-body text-center">
                                     <p className="card-title fw-bold">{card.name}</p>
+                                    <p className="text-primary mb-0">
+                                        {card.avgRating === "Sin calificación " ? (
+                                            <span>Sin calificación</span>
+                                        ) : (
+                                            <>
+                                                <i className="fas fa-spoon me-1"></i>{card.avgRating}/5
+                                            </>
+                                        )}
+                                    </p>
                                 </div>
                             </div>
                         </div>
