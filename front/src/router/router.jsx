@@ -7,6 +7,7 @@ import PasswordReset from "../modules/auth/views/RecoverPassword.jsx";
 import MyRecipes from "../modules/recipes/views/MyRecipes.jsx";
 import RecipeForm from "../modules/recipes/views/RecipeForm.jsx";
 import Register from "../modules/auth/views/Register.jsx";
+import Mycomment from "../modules/comments/views/Mycomment.jsx";
 
 const AppRouter = () => {
     const location = useLocation();
@@ -25,6 +26,7 @@ const AppRouter = () => {
                 <Route path= "/recipeform" element = {<RecipeForm />} />
                 <Route path="/forgot-password" element={<PasswordReset />} />
                 <Route path="/signup" element={<Register />}/>
+                <Route path= "/mycomment" element = {<Mycomment />} />
             </Routes>
         </>
     );
