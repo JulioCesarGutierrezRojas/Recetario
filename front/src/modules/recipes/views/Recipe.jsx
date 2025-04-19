@@ -9,7 +9,7 @@ const Recipe = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { cardData } = location.state || {};
-    
+
     const [averageRating, setAverageRating] = useState(4.2);
     const [reviews, setReviews] = useState([]); 
 
@@ -40,7 +40,7 @@ const Recipe = () => {
         <div className="container-fluid align-items-center pt-4 mt-5">
             <div className="row d-flex position-relative">
                 <div className="col-8">
-                    <img src={cardData.img} className="img-fluid rounded shadow-sm w-100" alt={cardData.title}
+                    <img src={cardData.image} className="img-fluid rounded shadow-sm w-100" alt={cardData.name}
                         style={{ height: "350px", objectFit: "cover" }} />
                 </div>
 
@@ -71,11 +71,11 @@ const Recipe = () => {
                     <div className=" bg-body-secondary rounded shadow" style={{width:300}}>
                         <h5 className='fw-bold mt-2'>Ingredientes</h5>
                         <ul className="list-unstyled mt-3">
-                            {["Harina", "Azúcar", "Leche", "Huevos", "Mantequilla"].map((ingrediente, index) => (
+                            {cardData.recipe_ingredients && cardData.recipe_ingredients.map((item, index) => (
                                 <li key={index} className="d-flex align-items-center mt-2">
                                     <input type="checkbox" id={`ingrediente-${index}`} className="form-check-input me-2"/>
                                     <label htmlFor={`ingrediente-${index}`} className="form-check-label">
-                                        {ingrediente}
+                                        {item.ingredient || item.name || `Ingrediente ${index + 1}`} - {item.quantity}
                                     </label>
                                 </li>
                             ))}
@@ -89,31 +89,8 @@ const Recipe = () => {
                             <ul className="list-unstyled mt-3">
                                 <li className="d-flex align-items-center mt-2">
                                     <label className="form-check-label text-justify">
-                                    Calienta el aceite vegetal en una olla y agrega la cebolla, el ajo, el tomate verde y el chile jalapeño. Cocina por 8 minutos, retira y coloca en una licuadora.
+                                        {cardData.process || "No hay procedimiento disponible."}
                                     </label>
-                                </li>
-                                <li className="d-flex align-items-center mt-2">
-                                    <label className="form-check-label text-justify">
-                                    Licúa los tomates, la cebolla, el chile, el ajo, el jalapeño, el caldo de pollo, la crema ácida, la sal y la pimienta por 2 minutos.
-                                    </label>
-                                </li>
-                                <li className="d-flex align-items-center mt-2">
-                                    <label className="form-check-label text-justify">
-                                    Derrite la mantequilla en una sartén de hierro a fuego medio, agrega la cebolla y cocina por 2 minutos. Después añade los chayotes y la salsa y cocina a fuego bajo por 5 minutos.
-                                    Agrega el queso manchego y hornea a 200 °C por 5 minutos. Sirve los chayotes suizos en la misma sartén, decora con hojas de cilantro y acompaña con arroz blanco.
-                                    </label>    
-                                </li>
-                                <li className="d-flex align-items-center mt-2">
-                                    <label className="form-check-label text-justify">
-                                    Derrite la mantequilla en una sartén de hierro a fuego medio, agrega la cebolla y cocina por 2 minutos. Después añade los chayotes y la salsa y cocina a fuego bajo por 5 minutos.
-                                    Agrega el queso manchego y hornea a 200 °C por 5 minutos. Sirve los chayotes suizos en la misma sartén, decora con hojas de cilantro y acompaña con arroz blanco.
-                                    </label>    
-                                </li>
-                                <li className="d-flex align-items-center mt-2">
-                                    <label className="form-check-label text-justify">
-                                    Derrite la mantequilla en una sartén de hierro a fuego medio, agrega la cebolla y cocina por 2 minutos. Después añade los chayotes y la salsa y cocina a fuego bajo por 5 minutos.
-                                    Agrega el queso manchego y hornea a 200 °C por 5 minutos. Sirve los chayotes suizos en la misma sartén, decora con hojas de cilantro y acompaña con arroz blanco.
-                                    </label>    
                                 </li>
                             </ul>
                         </div>
