@@ -14,17 +14,18 @@ const Mycomment = () => {
                 getRecipes(), 
                 getComments(),
                 getRatings(),
+                
             ]);
-
-            // Combinar datos por ID (o ajusta esto según tu estructura real)
+            
             const merged = comments.map(comment => {
-                const recipe = recipes.find(r => r.id === comment.recipe_id);
-                const rating = ratings.find(r => r.comment_id === comment.id);
+                const recipe = recipes.find(r => r.id === comment.recipe); 
+
+                const rating = ratings.find(r => r.id === comment.id);
                 return {
                     id: comment.id,
                     name: recipe ? recipe.name : 'Desconocido',
-                    comment: comment.content || 'Sin comentario',
-                    calification: rating ? rating.value : 'Sin calificación',
+                    comment: comment.comment || 'Sin comentario',
+                    calification: rating ? rating.calification : 'Sin calificación',
                 };
             });
 
@@ -46,7 +47,8 @@ const Mycomment = () => {
 
     return (
         <div className="container mt-5 pt-5">
-            <table className="table table-hover">
+            <h1 className="text-center fw-bold">Mis comentarios realizados</h1>
+            <table className="table table-hover mt-5">
                 <thead className="thead-light">
                     <tr>
                         <th>Receta</th>
@@ -56,7 +58,7 @@ const Mycomment = () => {
                 </thead>
                 <tbody>
                     {currentItems.map((item) => (
-                        <tr key={item.id}>
+                        <tr>
                             <td>{item.name}</td>
                             <td>{item.comment}</td>
                             <td>{item.calification}</td>
@@ -65,7 +67,6 @@ const Mycomment = () => {
                 </tbody>
             </table>
 
-            {/* Paginación */}
             <nav>
                 <ul className="pagination justify-content-center">
                     <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
