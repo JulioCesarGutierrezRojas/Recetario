@@ -43,7 +43,7 @@ const LoginForm = () => {
             await signIn(email, password);
 
             const role = localStorage.getItem('role');
-            role === 'admin' ? navigate('/dashboard') : navigate('/home');
+            role === 'Administrador' ? navigate('/users') : navigate('/home');
         } catch (e) {
             showWarningToast({ title: 'Error', text: e.message });
         } finally {
