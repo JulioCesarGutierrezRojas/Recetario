@@ -3,11 +3,17 @@ import { UserController } from "../adapters/controller";
 import {
   showAlertWithoutCancel,
   showConfirmation,
-  showSuccessToast,} from "../../../kernel/alerts";
+  showSuccessToast,
+  showErrorToast
+} from "../../../kernel/alerts";
 import Loader from "../../../components/Loader";
+import { validateRegisterFormForAdmin } from "../../../kernel/validations";
+import { Eye, EyeOff } from "lucide-react";
 
 export const Register = ({ onSuccess }) => {
-  
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -32,14 +38,18 @@ export const Register = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.passwordConfirm) {
-      showAlertWithoutCancel(
-        "Contraseñas no coinciden",
-        "Por favor verifica que ambas contraseñas sean iguales",
-        "error"
-      );
+    const validationErrors = validateRegisterFormForAdmin(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      const firstError = Object.values(validationErrors)[0];
+
+      showErrorToast({
+        title: 'Error de validación',
+        text: firstError,
+      });
+
       return;
     }
+
     showConfirmation(
       "¿Está seguro de registrar este usuario?",
       "Esta acción agregará el usuario al sistema",
@@ -76,7 +86,7 @@ export const Register = ({ onSuccess }) => {
         "error"
       );
       resetForm();
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -137,31 +147,71 @@ export const Register = ({ onSuccess }) => {
 
       <div className="mb-3">
         <label>Contraseña</label>
-        <input
-          type="password"
-          className="form-control"
-          value={formData.password}
-          onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
-          }
-          required
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            className="form-control pr-10"
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+            required
+            style={{ paddingRight: "2.5rem" }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "none",
+              border: "none",
+              padding: 0,
+              margin: 0,
+              cursor: "pointer",
+            }}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
       </div>
 
       <div className="mb-3">
         <label>Confirmar Contraseña</label>
-        <input
-          type="password"
-          className="form-control"
-          value={formData.passwordConfirm}
-          onChange={(e) =>
-            setFormData({ ...formData, passwordConfirm: e.target.value })
-          }
-          required
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPasswordConfirm ? "text" : "password"}
+            className="form-control"
+            value={formData.passwordConfirm}
+            onChange={(e) =>
+              setFormData({ ...formData, passwordConfirm: e.target.value })
+            }
+            required
+            style={{ paddingRight: "2.5rem" }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "none",
+              border: "none",
+              padding: 0,
+              margin: 0,
+              cursor: "pointer",
+            }}
+          >
+            {showPasswordConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
       </div>
 
-      <button type="submit" className="btn btn-secondary w-100">
+      <button type="submit" className="btn btn-primary w-100">
         Registrar Usuario
       </button>
     </form>
