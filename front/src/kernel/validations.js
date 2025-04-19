@@ -9,11 +9,35 @@ export const validatePassword = (password) => {
     return passwordRegex.test(password);
 };
 
+export const validateNewPassword = (formData) => {
+    const errors = {};
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])(?!.*\s).{8,}$/;
+    
+    if (!formData.password || !formData.password.trim()) {
+        errors.password = "La contraseña no puede estar vacía";
+    } else if (!passwordRegex.test(formData.password)) {
+        errors.password = "La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial";
+    }
+
+    if (!formData.passwordConfirm || !formData.passwordConfirm.trim()) {
+        errors.passwordConfirm = "Debes confirmar tu contraseña";
+    } else if (formData.password !== formData.passwordConfirm) {
+        errors.passwordConfirm = "Las contraseñas no coinciden";
+    }
+
+    return errors;
+};
+
 export const validateRegisterForm = (formData) => {
     const errors = {};
+    const repeatedCharRegex = /(.)\1{3,}/;
 
     if (!formData.name.trim()) {
         errors.name = "El nombre no puede estar vacío";
+    } else if (/^\d+$/.test(formData.name.trim())) {
+        errors.name = "El nombre no puede contener solo números";
+    } else if (repeatedCharRegex.test(formData.name.trim())) {
+        errors.name = "El nombre no puede contener letras repetidas excesivamente";
     }
 
     if (!formData.email.trim()) {
@@ -45,27 +69,105 @@ export const validateRegisterForm = (formData) => {
     return errors;
 };
 
-// Validación de campos vacíos o solo espacios en blanco
+export const validateNoExcessiveRepetition = (value, fieldName) => {
+    const repeatedCharRegex = /(.)\1{4,}/; 
+    if (repeatedCharRegex.test(value)) {
+        return `${fieldName} contiene caracteres repetitivos excesivos`;
+    }
+    return null;
+};
+
 export const validateNonEmpty = (value, fieldName) => {
     if (!value.trim()) {
-      return `${fieldName} no puede estar vacío o contener solo espacios`;
+        return `${fieldName} no puede estar vacío o contener solo espacios`;
     }
     return null;
-  };
-  
-  // Validación de imagen (debe ser tipo 'image/*')
-  export const validateImage = (file) => {
+};
+
+
+export const validateImage = (file) => {
     if (file && !file.type.startsWith('image/')) {
-      return "El archivo debe ser una imagen";
+        return "El archivo debe ser una imagen";
     }
     return null;
-  };
-  
-  // Validación para cantidad de ingrediente (solo números enteros o decimales)
-  export const validateQuantity = (quantity) => {
-    const quantityRegex = /^\d+(\.\d+)?$/; // Acepta números enteros o decimales
+};
+
+
+export const validateQuantity = (quantity) => {
+    const quantityRegex = /^\d+(\.\d+)?$/;
     if (!quantityRegex.test(quantity)) {
-      return "La cantidad debe ser un número válido (entero o decimal)";
+        return "La cantidad debe ser un número válido (entero o decimal)";
     }
     return null;
+};
+
+export const validateRegisterFormForAdmin = (formData) => {
+    const errors = {};
+
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])(?!.*\s).{8,}$/;
+    const repeatedCharRegex = /(.)\1{3,}/;
+
+    if (!formData.name.trim()) {
+        errors.name = "El nombre no puede estar vacío";
+    } else if (/^\d+$/.test(formData.name.trim())) {
+        errors.name = "El nombre no puede contener solo números";
+    } else if (repeatedCharRegex.test(formData.name.trim())) {
+        errors.name = "El nombre no puede contener letras repetidas excesivamente";
+    }
+
+    if (!formData.email || !formData.email.trim()) {
+        errors.email = "El correo no puede estar vacío";
+    } else if (!emailRegex.test(formData.email) || formData.email.includes(' ')) {
+        errors.email = "Correo no válido";
+    }
+
+    if (!formData.sex || !formData.sex.trim()) {
+        errors.sex = "Selecciona un género";
+    }
+
+    if (!formData.role || !formData.role.trim()) {
+        errors.role = "El rol es obligatorio";
+    }
+
+    if (!formData.password || !formData.password.trim()) {
+        errors.password = "La contraseña no puede estar vacía";
+    } else if (!passwordRegex.test(formData.password)) {
+        errors.password = "La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial";
+    }
+
+    if (!formData.passwordConfirm || !formData.passwordConfirm.trim()) {
+        errors.passwordConfirm = "Debes confirmar tu contraseña";
+    } else if (formData.password !== formData.passwordConfirm) {
+        errors.passwordConfirm = "Las contraseñas no coinciden";
+    }
+
+    return errors;
+};
+
+
+export const validateUpdateUserForm = (formData) => {
+    const errors = {};
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/;
+    const repeatedCharRegex = /(.)\1{3,}/;
+
+    if (!formData.name.trim()) {
+        errors.name = "El nombre no puede estar vacío";
+    } else if (/^\d+$/.test(formData.name.trim())) {
+        errors.name = "El nombre no puede contener solo números";
+    } else if (repeatedCharRegex.test(formData.name.trim())) {
+        errors.name = "El nombre no puede contener letras repetidas excesivamente";
+    }
+
+    if (!formData.email || !formData.email.trim()) {
+        errors.email = "El correo no puede estar vacío";
+    } else if (!emailRegex.test(formData.email) || formData.email.includes(' ')) {
+        errors.email = "Correo no válido";
+    }
+
+    if (!formData.sex.trim()) {
+        errors.sex = "Selecciona un género";
+    }
+
+    return errors;
 };

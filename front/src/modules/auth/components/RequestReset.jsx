@@ -3,12 +3,22 @@ import styles from '../../../styles/form-login.module.css';
 import {showSuccessToast, showWarningToast} from "../../../kernel/alerts.js";
 import {sendEmail} from "../controller/controller.js";
 import Loader from "../../../components/Loader.jsx";
+import { validateEmail } from "../../../kernel/validations.js";
 
 const RequestReset = ({ email, setEmail, setStep }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateEmail(email)) {
+            showWarningToast({
+                title: 'Correo inválido',
+                text: 'Por favor ingresa un correo electrónico válido.'
+            });
+            return;
+        }
+        
         setIsLoading(true);
         try {
             const response = await sendEmail(email);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { UserController } from '../adapters/controller';
 import {showSuccessToast, showErrorToast, showConfirmation} from '../../../kernel/alerts';
 import Loader from '../../../components/Loader';
+import { validateUpdateUserForm } from '../../../kernel/validations';
 
 export const Update = ({ initialData, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,17 @@ export const Update = ({ initialData, onSuccess }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const validationErrors = validateUpdateUserForm(formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      const firstError = Object.values(validationErrors)[0];
+      showErrorToast({
+        title: 'Error de validación',
+        text: firstError
+      });
+      return;
+    }
 
     showConfirmation(
       '¿Estás segura/o?',

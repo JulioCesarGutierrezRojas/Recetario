@@ -6,6 +6,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { showErrorToast, showSuccessToast } from "../../../kernel/alerts";
 import { getRecipes, updateRecipe, deleteRecipe } from "../controller/controllerMyrecipes";
+import { validateNonEmpty, validateNoExcessiveRepetition } from "../../../kernel/validations";
 
 
 const MyRecipes = () => {
@@ -117,6 +118,24 @@ const MyRecipes = () => {
     };
 
     const handleSaveEdit = async () => {
+
+        const errors = [
+            validateNonEmpty(title, "Título"),
+            validateNoExcessiveRepetition(title, "Título"),
+            validateNonEmpty(process, "Proceso"),
+            validateNoExcessiveRepetition(process, "Proceso"),
+            validateNonEmpty(tips, "Consejos para Servir"),
+            validateNoExcessiveRepetition(tips, "Consejos para Servir")
+        ].filter(Boolean); 
+        
+        if (errors.length > 0) {
+            showErrorToast({
+                title: "Validación",
+                text: errors.join("\n")
+            });
+            return; 
+        }
+
         if (!selectedRecipe) return;
     
         const result = await Swal.fire({

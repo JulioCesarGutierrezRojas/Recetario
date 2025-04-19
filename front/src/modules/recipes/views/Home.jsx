@@ -4,44 +4,46 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from "react-router";
 import { useEffect, useState } from 'react';
 import { getAllRecipes, getAllRatings } from '../controller/controllerHome';
+import { FaUtensilSpoon } from "react-icons/fa";
+
 
 const Home = () => {
 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const [cards, setCards] = useState([]);
 
-    const handleCardClick = (card) => {            
-        navigate('/recipe', { state: { cardData: card } }); 
+    const handleCardClick = (card) => {
+        navigate('/recipe', { state: { cardData: card } });
     };
 
-    
+
     useEffect(() => {
         const fetchData = async () => {
-          const [recipes, ratings] = await Promise.all([
-            getAllRecipes(),
-            getAllRatings()
-          ]);
-          console.log("Ratings:", ratings);
-      
-          const recipesWithRatings = recipes.map(recipe => {
-            const recipeRatings = ratings.filter(r => r.recipe_id === recipe.id);
-            const avgRating = recipeRatings.length
-                ? (recipeRatings.reduce((sum, r) => sum + r.calification, 0) / recipeRatings.length).toFixed(1)
-                : "Sin calificación";
-            
-            return { ...recipe, avgRating };
-          });
-      
-          setCards(recipesWithRatings);
+            const [recipes, ratings] = await Promise.all([
+                getAllRecipes(),
+                getAllRatings()
+            ]);
+
+
+            const recipesWithRatings = recipes.map(recipe => {
+                const rating = ratings.find(r => r.recipe === recipe.id);
+
+                return {
+                    ...recipe,
+                    calification: rating ? rating.calification : 'Sin calificación'
+                };
+            });
+
+            setCards(recipesWithRatings);
         };
-      
+
         fetchData();
     }, []);
 
 
     return (
         <>
-                        
+
             <div className="container-fluid d-flex flex-column align-items-center pt-5 mt-3">
                 <div id="carouselExampleInterval" className="carousel slide w-100" data-bs-ride="carousel">
                     <div className="carousel-inner">
@@ -54,7 +56,7 @@ const Home = () => {
                         <div className="carousel-item shadow-sm" data-bs-interval="3000">
                             <img src="https://www.clara.es/medio/2023/01/12/recetas-saludables_32d84f1c_1200x630.jpg" className="img-fluid w-100" style={{ height: "350px", objectFit: "cover" }} />
                         </div>
-                    </div>  
+                    </div>
                     <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
                         <span className="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span className="visually-hidden">Previous</span>
@@ -75,7 +77,7 @@ const Home = () => {
                 <div className="row">
                     {cards.map((card, index) => (
                         <div key={index} className="col-md-2 mb-4 d-flex justify-content-center">
-                            <div 
+                            <div
                                 className="card shadow-sm"
                                 style={{ width: "12rem", cursor: "pointer", transition: "transform 0.2s" }}
                                 onClick={() => handleCardClick(card)}
@@ -85,15 +87,18 @@ const Home = () => {
                                 <img src={card.image} className="card-img-top" alt={card.name} style={{ height: "300px", objectFit: "cover" }} />
                                 <div className="card-body text-center">
                                     <p className="card-title fw-bold">{card.name}</p>
-                                    <p className="text-primary mb-0">
-                                        {card.avgRating === "Sin calificación " ? (
-                                            <span>Sin calificación</span>
-                                        ) : (
-                                            <>
-                                                <i className="fas fa-spoon me-1"></i>{card.avgRating}/5
-                                            </>
-                                        )}
+                                    
+                                    <p className="mb-1">
+                                        {Array.from({ length: 5 }, (_, i) => (
+                                            <FaUtensilSpoon
+                                                key={i}
+                                                size={20}
+                                                color={i < Math.round(card.calification) ? "#FFCC00" : "#e4e5e9"}
+                                                style={{ marginRight: "2px" }}
+                                            />
+                                        ))}
                                     </p>
+                                    <small className="text-muted">{card.calification.toFixed(1)} / 5</small>
                                 </div>
                             </div>
                         </div>
