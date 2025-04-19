@@ -69,6 +69,13 @@ export const validateRegisterForm = (formData) => {
     return errors;
 };
 
+export const validateNoExcessiveRepetition = (value, fieldName) => {
+    const repeatedCharRegex = /(.)\1{4,}/; 
+    if (repeatedCharRegex.test(value)) {
+        return `${fieldName} contiene caracteres repetitivos excesivos`;
+    }
+    return null;
+};
 
 export const validateNonEmpty = (value, fieldName) => {
     if (!value.trim()) {

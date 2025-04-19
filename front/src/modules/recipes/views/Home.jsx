@@ -87,7 +87,7 @@ const Home = () => {
                                 <img src={card.image} className="card-img-top" alt={card.name} style={{ height: "300px", objectFit: "cover" }} />
                                 <div className="card-body text-center">
                                     <p className="card-title fw-bold">{card.name}</p>
-                                    {/* Cucharas (estilo actual) */}
+                                    
                                     <p className="mb-1">
                                         {Array.from({ length: 5 }, (_, i) => (
                                             <FaUtensilSpoon
