@@ -41,10 +41,10 @@ const NavBar = ({ isAdmin }) => {
                     <NavDropdown title={<span className="text-secondary">{user}</span>} align="end" className="custom-dropdown">
                         {isAdmin ? (
                             <>
-                                <NavDropdown.Item onClick={() => navigate("/myrecipes")}>
-                                    Mis Recetas
+                                <NavDropdown.Item onClick={() => navigate("/userRecipes")}>
+                                    Recetas
                                 </NavDropdown.Item>
-                                <NavDropdown.Item href="/">Usuarios</NavDropdown.Item>
+                                <NavDropdown.Item href="/users">Usuarios</NavDropdown.Item>
                             </>
                         ) : (
                             <>
