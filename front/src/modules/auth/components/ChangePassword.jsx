@@ -4,6 +4,7 @@ import {useNavigate} from "react-router";
 import {showSuccessToast, showWarningToast} from "../../../kernel/alerts.js";
 import {changePassword} from "../controller/controller.js";
 import Loader from "../../../components/Loader.jsx";
+import { validateNewPassword } from '../../../kernel/validations.js';
 
 const ChangePassword = ({ email, token, setStep, user }) => {
     const [newPassword, setNewPassword] = useState('');
@@ -15,6 +16,20 @@ const ChangePassword = ({ email, token, setStep, user }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const formData = {
+            password: newPassword,
+            passwordConfirm: confirmPassword
+        };
+    
+        const errors = validateNewPassword(formData);
+    
+        if (Object.keys(errors).length > 0) {
+            const firstErrorKey = Object.keys(errors)[0];
+            showWarningToast({ title: 'Error', text: errors[firstErrorKey] });
+            return;
+        }
+
         setIsLoading(true);
         try {
             const response = await changePassword(user, newPassword, confirmPassword);
