@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { showErrorToast, showSuccessToast } from "../../../kernel/alerts";
 import { getIngredients, createIngredient, createRecipe, associateIngredientsWithRecipe } from "../controller/controllerRecipeForm";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router"; 
 import { validateNonEmpty, validateImage, validateQuantity } from "../../../kernel/validations"; 
 
 const RecipeForm = () => {
