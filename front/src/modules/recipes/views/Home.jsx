@@ -30,7 +30,7 @@ const Home = () => {
 
                 return {
                     ...recipe,
-                    calification: rating ? rating.calification : 'Sin calificación'
+                    calification: rating && typeof rating.calification === "number" ? rating.calification : 0
                 };
             });
 
