@@ -13,7 +13,7 @@ const Mycomment = () => {
     ];
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 3;
+    const itemsPerPage = 6;
 
     const totalPages = Math.ceil(Comments.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -48,7 +48,7 @@ const Mycomment = () => {
                 </tbody>
             </table>
 
-            {/* Paginación */}
+
             <nav>
                 <ul className="pagination justify-content-center">
                     <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
