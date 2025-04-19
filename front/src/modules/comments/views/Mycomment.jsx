@@ -1,23 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { getComments, getRatings, getRecipes } from "../controller/controllerMycomment";
 
 const Mycomment = () => {
-    const Comments = [
-        { id: 1, recipe: "Pizza", rating: "5", comment: "Delicious!" },
-        { id: 2, recipe: "Pasta", rating: "4", comment: "Tasty but a bit salty." },
-        { id: 3, recipe: "Burger", rating: "5", comment: "Perfect!" },
-        { id: 4, recipe: "Salad", rating: "3", comment: "Fresh but boring." },
-        { id: 5, recipe: "Sushi", rating: "5", comment: "Amazing!" },
-        { id: 6, recipe: "Soup", rating: "4", comment: "Warm and comforting." },
-    ];
-
+    const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
 
-    const totalPages = Math.ceil(Comments.length / itemsPerPage);
+    useEffect(() => {
+        const fetchData = async () => {
+            const [recipes, comments, ratings] = await Promise.all([
+                getRecipes(), 
+                getComments(),
+                getRatings(),
+            ]);
+
+            // Combinar datos por ID (o ajusta esto según tu estructura real)
+            const merged = comments.map(comment => {
+                const recipe = recipes.find(r => r.id === comment.recipe_id);
+                const rating = ratings.find(r => r.comment_id === comment.id);
+                return {
+                    id: comment.id,
+                    name: recipe ? recipe.name : 'Desconocido',
+                    comment: comment.content || 'Sin comentario',
+                    calification: rating ? rating.value : 'Sin calificación',
+                };
+            });
+
+            setData(merged);
+        };
+
+        fetchData();
+    }, []);
+
+    const totalPages = Math.ceil(data.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentItems = Comments.slice(startIndex, startIndex + itemsPerPage);
+    const currentItems = data.slice(startIndex, startIndex + itemsPerPage);
 
     const goToPage = (pageNumber) => {
         if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -30,25 +49,23 @@ const Mycomment = () => {
             <table className="table table-hover">
                 <thead className="thead-light">
                     <tr>
-                        <th>ID</th>
                         <th>Receta</th>
-                        <th>Calificación</th>
                         <th>Comentarios</th>
+                        <th>Calificación</th>
                     </tr>
                 </thead>
                 <tbody>
                     {currentItems.map((item) => (
                         <tr key={item.id}>
-                            <td>{item.id}</td>
-                            <td>{item.recipe}</td>
-                            <td>{item.rating}</td>
+                            <td>{item.name}</td>
                             <td>{item.comment}</td>
+                            <td>{item.calification}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-
+            {/* Paginación */}
             <nav>
                 <ul className="pagination justify-content-center">
                     <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
