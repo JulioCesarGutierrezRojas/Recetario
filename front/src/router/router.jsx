@@ -7,11 +7,11 @@ import PasswordReset from "../modules/auth/views/RecoverPassword.jsx";
 import MyRecipes from "../modules/recipes/views/MyRecipes.jsx";
 import RecipeForm from "../modules/recipes/views/RecipeForm.jsx";
 import Register from "../modules/auth/views/Register.jsx";
-import Mycomment from "../modules/comments/views/Mycomment.jsx";
+import { UserList } from "../modules/users/views/UserList";
 
 const AppRouter = () => {
     const location = useLocation();
-    const isAdmin = localStorage.getItem("role") === "admin";
+    const isAdmin = localStorage.getItem("role") === "Administrador";
 
     const hiddenNavBar = ['/', '/signup', '/forgot-password'];
 
@@ -26,7 +26,7 @@ const AppRouter = () => {
                 <Route path= "/recipeform" element = {<RecipeForm />} />
                 <Route path="/forgot-password" element={<PasswordReset />} />
                 <Route path="/signup" element={<Register />}/>
-                <Route path= "/mycomment" element = {<Mycomment />} />
+                <Route path="/users/" element={<UserList />} />,
             </Routes>
         </>
     );

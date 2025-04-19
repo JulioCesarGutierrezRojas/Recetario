@@ -5,6 +5,8 @@ import logo from '../../../assets/logo-recetario.jpg';
 import Loader from "../../../components/Loader.jsx";
 import {showWarningToast} from "../../../kernel/alerts.js";
 import {signIn} from "../controller/controller.js";
+import { validateEmail, validatePassword } from "../../../kernel/validations.js";
+
 
 const LoginForm = () => {
     const [password, setPassword] = useState('');
@@ -16,12 +18,32 @@ const LoginForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        const emailError = validateEmail(email);
+        const passwordError = validatePassword(password);
+
+        if (!emailError) {
+            showWarningToast({
+                title: 'Correo inválido',
+                text: 'Por favor ingresa un correo válido sin espacios.'
+            });
+            setIsLoading(false);
+            return;
+        }
+
+        if (!passwordError) {
+            showWarningToast({
+                title: 'Contraseña inválida',
+                text: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número, un carácter especial y sin espacios.'
+            });
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            await signIn(email, password)
+            await signIn(email, password);
 
             const role = localStorage.getItem('role');
-
-            role === 'admin' ? navigate('/dashboard') : navigate('/home')
+            role === 'Administrador' ? navigate('/users') : navigate('/home');
         } catch (e) {
             showWarningToast({ title: 'Error', text: e.message });
         } finally {

@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { showErrorToast, showSuccessToast } from "../../../kernel/alerts";
 import { getIngredients, createIngredient, createRecipe, associateIngredientsWithRecipe } from "../controller/controllerRecipeForm";
-
+import { useNavigate } from "react-router"; 
+import { validateNonEmpty, validateImage, validateQuantity } from "../../../kernel/validations"; 
 
 const RecipeForm = () => {
+
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [process, setProcess] = useState("");
   const [tips, setTips] = useState("");
@@ -62,9 +66,34 @@ const handleSubmit = async (event) => {
   event.preventDefault();
 
   try {
-    
-    if (!title || !process || !tips || !image) {
-      throw new Error("Todos los campos son obligatorios.");
+    // Validación de campos vacíos o solo espacios en blanco
+    if (
+      validateNonEmpty(title, "Título") ||
+      validateNonEmpty(process, "Proceso") ||
+      validateNonEmpty(tips, "Consejos para Servir") ||
+      !image
+    ) {
+      throw new Error("Todos los campos son obligatorios y no pueden estar vacíos.");
+    }
+
+    // Validación de imagen
+    const imageError = validateImage(image);
+    if (imageError) {
+      throw new Error(imageError);
+    }
+
+    // Validación de ingredientes
+    const invalidIngredient = ingredients.find((ingredient, index) => {
+      const ingredientError = validateNonEmpty(ingredient.ingredient, `Ingrediente ${index + 1}`);
+      const quantityError = validateQuantity(ingredient.quantity);
+      if (ingredientError || quantityError) {
+        return true;
+      }
+      return false;
+    });
+
+    if (invalidIngredient) {
+      throw new Error("Hay errores en los ingredientes. Verifica los campos.");
     }
 
     const ingredientsData = ingredients.map(ing => ({
@@ -80,9 +109,13 @@ const handleSubmit = async (event) => {
     formData.append("recipe_ingredients", JSON.stringify(ingredientsData));
 
 
-  
+
     const recipeResponse = await createRecipe(formData);
     showSuccessToast({ title: "Receta creada", text: "¡Éxito!" });
+
+    setTimeout(() => {
+      navigate('/myrecipes');
+    }, 1500);
 
   } catch (error) {
     console.error("Error al crear la receta:", error.response?.data || error.message);
@@ -90,10 +123,21 @@ const handleSubmit = async (event) => {
   }
 };
 
+const handleBackHome = () => {
+  navigate("/home");
+};
 
   return (
-    <div className="container mt-4">
-      <h2>Crear Receta</h2>
+    <div className="container pt-5 mt-4">
+      <br></br>
+
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2>Crear Receta</h2>
+        <div className="d-flex gap-2">  
+          <button className="btn btn-secondary" onClick={handleBackHome}>Regresar al Menú</button>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div className="mb-3">
           <label className="form-label">Título</label>

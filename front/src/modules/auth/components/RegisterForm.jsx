@@ -4,6 +4,7 @@ import styles from '../../../styles/form-login.module.css';
 import Loader from "../../../components/Loader.jsx";
 import {showSuccessToast, showWarningToast} from "../../../kernel/alerts.js";
 import {registerUser} from "../controller/controller.js";
+import { validateRegisterForm } from "../../../kernel/validations.js";
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({
@@ -29,17 +30,33 @@ const RegisterForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (formData.password !== formData.confirmPassword) {
-            showWarningToast({ title: 'Error', text: 'Las contraseñas no coinciden' });
+        const cleanedData = {
+            ...formData,
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            gender: formData.gender.trim(),
+            password: formData.password.trim(),
+            confirmPassword: formData.confirmPassword.trim()
+        };
+    
+        const validationErrors = validateRegisterForm(cleanedData);
+        if (Object.keys(validationErrors).length > 0) {
+            const firstError = Object.values(validationErrors)[0];
+            showWarningToast({ title: 'Error', text: firstError });
             return;
         }
-
+    
         setIsLoading(true);
         try {
-            const response = await registerUser(formData.name, formData.email, formData.gender, formData.password);
-
+            const response = await registerUser(
+                cleanedData.name,
+                cleanedData.email,
+                cleanedData.gender,
+                cleanedData.password
+            );
+    
             showSuccessToast({ title: 'Éxito', text: response });
-
+            
             navigate('/');
         } catch (e) {
             showWarningToast({ title: 'Error', text: e.message });
