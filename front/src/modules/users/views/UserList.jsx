@@ -18,7 +18,6 @@ export const UserList = () => {
     setLoading(true);
     try {
       const data = await UserController.getUsers();
-      console.log(data);
       setUsers(data.result);
     } catch (error) {
       console.error('Error fetching users:', error);
