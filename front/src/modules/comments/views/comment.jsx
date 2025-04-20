@@ -46,7 +46,7 @@ const CommentSection = ({ reviews, setReviews, recipeId }) => {
 
     setIsSubmitting(false);
   };
-  
+
   return (
     <div style={{ maxWidth: "600px", margin: "20px auto", textAlign: "left" }}>
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
@@ -91,6 +91,15 @@ const CommentSection = ({ reviews, setReviews, recipeId }) => {
                 : <span style={{ color: "#ccc" }}>Sin calificación</span>}
             </div>
             <p>{review.comment || review.text || "Comentario vacío"}</p>
+            <div style={{ fontSize: "0.85em", color: "#666" }}>
+              {new Date(review.created_at).toLocaleString("es-MX", {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </div>
           </div>
         ))
       )}
