@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaUtensilSpoon } from "react-icons/fa";
 import Ratings from '../../ratings/views/Ratings';
-import { createComment, postRating, getCommentsByRecipe } from "../../comments/controller/controllerComments";
+import { createComment, getCommentsByRecipe } from "../../comments/controller/controllerComments";
 
 const CommentSection = ({ reviews, setReviews, recipeId }) => {
   const [comment, setComment] = useState("");
@@ -29,11 +29,11 @@ const CommentSection = ({ reviews, setReviews, recipeId }) => {
 
     try {
       const newComment = await createComment(recipeId, comment, rating);
-      await postRating({ recipeId, rating });
 
       const nuevoComentario = {
         ...newComment,
         rating: rating,
+        comment: comment.trim(),
       };
 
       setReviews([nuevoComentario, ...reviews]);
@@ -41,11 +41,12 @@ const CommentSection = ({ reviews, setReviews, recipeId }) => {
       setRating(0);
     } catch (error) {
       console.error("Error al enviar comentario o calificación:", error);
+      alert("Algo salió mal, inténtalo más tarde.");
     }
 
     setIsSubmitting(false);
   };
-
+  
   return (
     <div style={{ maxWidth: "600px", margin: "20px auto", textAlign: "left" }}>
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
@@ -83,11 +84,13 @@ const CommentSection = ({ reviews, setReviews, recipeId }) => {
         reviews.map((review) => (
           <div key={review.id} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
             <div>
-              {Array.from({ length: review.rating }).map((_, i) => (
-                <FaUtensilSpoon key={i} size={20} color="#FFCC00" />
-              ))}
+              {review.rating
+                ? Array.from({ length: review.rating }).map((_, i) => (
+                  <FaUtensilSpoon key={i} size={20} color="#FFCC00" />
+                ))
+                : <span style={{ color: "#ccc" }}>Sin calificación</span>}
             </div>
-            <p>{review.text || review.comment}</p>
+            <p>{review.comment || review.text || "Comentario vacío"}</p>
           </div>
         ))
       )}
