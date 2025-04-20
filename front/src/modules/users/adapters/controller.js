@@ -11,7 +11,6 @@ export const UserController = {
     const response = await handleRequest('post', '/users/register/', payload);
     if (response.type !== 'SUCCESS')
       throw new Error("Error al crear el usuario: ");
-    console.log("desde el controller", response);
   return response;
   },
 

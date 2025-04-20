@@ -13,7 +13,6 @@ export const getAllRecipes = async () => {
 export const getAllRatings = async () => {
   try {
     const response = await handleRequest('get', 'ratings/');
-    console.log("Ratings API response:", response);
     return response.result || [];
   } catch (error) {
     console.error("Error en getAllRatings:", error);

@@ -10,7 +10,6 @@ export const RecipeController = {
     if (response.type !== 'SUCCESS') {
       throw new Error("Error al crear la receta: ");
     }
-    console.log("desde el controller", response);
     return response;
   },
 
@@ -19,7 +18,6 @@ export const RecipeController = {
     if (response.type !== 'SUCCESS') {
       throw new Error("Error al actualizar la receta: ");
     }
-    console.log("desde el controller update", response);
     return response;
   },
 
@@ -28,7 +26,6 @@ export const RecipeController = {
     if (response.type !== 'SUCCESS') {
       throw new Error("Error al eliminar la receta: ");
     }
-    console.log("desde el controller delete", response);
     return response;
   },
 };
