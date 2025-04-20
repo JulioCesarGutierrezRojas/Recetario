@@ -24,7 +24,7 @@ const NavBar = ({ isAdmin }) => {
     return (
         <Navbar className="bg-navbar fixed-top">
             <Container>
-                <Navbar.Brand className="text-secondary">
+                <Navbar.Brand href="/home" className="text-secondary">
                     <img className="img-logo" src={logo} alt="" />
                     Recetario
                 </Navbar.Brand>
@@ -44,6 +44,7 @@ const NavBar = ({ isAdmin }) => {
                                 <NavDropdown.Item onClick={() => navigate("/myrecipes")}>Mis Recetas</NavDropdown.Item>
                                 <NavDropdown.Item href="/users">Usuarios</NavDropdown.Item>
                                 <NavDropdown.Item href="/home">Menú de Recetas</NavDropdown.Item>
+                                <NavDropdown.Item href="/mycomment">Comentarios Realizados</NavDropdown.Item>
                             </>
                         ) : (
                             <>

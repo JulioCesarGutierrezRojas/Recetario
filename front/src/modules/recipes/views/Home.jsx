@@ -98,7 +98,7 @@ const Home = () => {
                                             />
                                         ))}
                                     </p>
-                                    <small className="text-muted">{card.calification.toFixed(1)} / 5</small>
+                                    <small className="text-muted fw-bold">Calificación: {card.calification.toFixed(1)} / 5</small>
                                 </div>
                             </div>
                         </div>
