@@ -3,7 +3,7 @@ import { Navbar, Container, NavDropdown, Nav, Form, InputGroup, Button } from 'r
 import { LogOut, Search } from "react-feather";
 import '../styles/navbar.css'
 import logo from "../assets/logo-recetario.jpg"
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 
 const NavBar = ({ isAdmin }) => {
     const [user, setUser] = useState();
@@ -44,7 +44,7 @@ const NavBar = ({ isAdmin }) => {
     return (
         <Navbar className="bg-navbar fixed-top">
             <Container>
-                <Navbar.Brand href="/home" className="text-secondary">
+                <Navbar.Brand as={Link} to="/home" className="text-secondary">
                     <img className="img-logo" src={logo} alt="" />
                     Sabor & Punto
                 </Navbar.Brand>
@@ -69,16 +69,16 @@ const NavBar = ({ isAdmin }) => {
                     <NavDropdown title={<span className="text-secondary">{user}</span>} align="end" className="custom-dropdown">
                         {isAdmin ? (
                             <>
-                                <NavDropdown.Item onClick={() => navigate("/myrecipes")}>Mis Recetas</NavDropdown.Item>
-                                <NavDropdown.Item href="/users">Usuarios</NavDropdown.Item>
-                                <NavDropdown.Item href="/userRecipes/">Recetas</NavDropdown.Item>
-                                <NavDropdown.Item href="/home">Menú de Recetas</NavDropdown.Item>
-                                <NavDropdown.Item href="/mycomment">Comentarios Realizados</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/myrecipes">Mis Recetas</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/users">Usuarios</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/userRecipes/">Recetas</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/home">Menú de Recetas</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/mycomment">Comentarios Realizados</NavDropdown.Item>
                             </>
                         ) : (
                             <>
-                                <NavDropdown.Item href="/myrecipes">Mis Recetas</NavDropdown.Item>
-                                <NavDropdown.Item href="/mycomment">Comentarios Realizados</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/myrecipes">Mis Recetas</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/mycomment">Comentarios Realizados</NavDropdown.Item>
                             </>
                         )}
                         <NavDropdown.Divider />
