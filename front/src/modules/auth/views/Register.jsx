@@ -9,9 +9,9 @@ const Register = () => {
             <div className={styles.leftPanel}>
                 <div className={styles.logoContainer}>
                     <div className={styles.logoWrapper}>
-                        <img src={logo} className={styles.logo} alt="Logo Recetario" />
+                        <img src={logo} className={styles.logo} alt="Logo Sabor & Punto" />
                     </div>
-                    <h1 className={styles.appName}>Recetario</h1>
+                    <h1 className={styles.appName}>Sabor & Punto</h1>
                     <p style={{fontSize: '1.2rem'}}>Únete a nuestra comunidad culinaria</p>
                 </div>
             </div>

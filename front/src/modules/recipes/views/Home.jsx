@@ -3,7 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from "react-router";
 import { useEffect, useState } from 'react';
-import { getAllRecipes, getAllRatings } from '../controller/controllerHome';
+import { getAllRecipes, getAllRatings, calculateAverageRating } from '../controller/controllerHome';
 import { FaUtensilSpoon } from "react-icons/fa";
 
 
@@ -26,11 +26,12 @@ const Home = () => {
 
 
             const recipesWithRatings = recipes.map(recipe => {
-                const rating = ratings.find(r => r.recipe === recipe.id);
+                // Calculate average rating using the helper function
+                const averageRating = calculateAverageRating(ratings, recipe.id);
 
                 return {
                     ...recipe,
-                    calification: rating && typeof rating.calification === "number" ? rating.calification : 0
+                    calification: averageRating
                 };
             });
 
@@ -87,7 +88,7 @@ const Home = () => {
                                 <img src={card.image} className="card-img-top" alt={card.name} style={{ height: "300px", objectFit: "cover" }} />
                                 <div className="card-body text-center">
                                     <p className="card-title fw-bold">{card.name}</p>
-                                    
+
                                     <p className="mb-1">
                                         {Array.from({ length: 5 }, (_, i) => (
                                             <FaUtensilSpoon
@@ -98,7 +99,7 @@ const Home = () => {
                                             />
                                         ))}
                                     </p>
-                                    <small className="text-muted">{card.calification.toFixed(1)} / 5</small>
+                                    <small className="text-muted fw-bold">Calificación: {card.calification.toFixed(1)} / 5</small>
                                 </div>
                             </div>
                         </div>

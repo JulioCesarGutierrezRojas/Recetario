@@ -59,9 +59,20 @@ export const Modal = ({ showModal, setShowModal, selectedRecipe, fetchRecipes })
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      // Validate file is an image
+      if (!file.type.match('image.*')) {
+        showWarningToast({ 
+          title: "Error", 
+          text: "Solo se permiten archivos de imagen (jpg, png, gif, etc.)" 
+        });
+        // Reset the input
+        e.target.value = '';
+        return;
+      }
       setFormData(prev => ({
         ...prev,
-        image: e.target.files[0]
+        image: file
       }));
     }
   };
@@ -160,6 +171,13 @@ export const Modal = ({ showModal, setShowModal, selectedRecipe, fetchRecipes })
 
       // Refresh the recipes list
       await fetchRecipes();
+
+      // Use Bootstrap's API to properly close the modal
+      const modalBackdrop = document.querySelector('.modal-backdrop');
+      if (modalBackdrop) {
+        modalBackdrop.remove();
+      }
+      document.body.classList.remove('modal-open');
       setShowModal(false);
     } catch (error) {
       showWarningToast({ title: 'Error', text: error.message || 'Error al guardar la receta' });
@@ -201,6 +219,12 @@ export const Modal = ({ showModal, setShowModal, selectedRecipe, fetchRecipes })
               className="btn-close" 
               onClick={() => {
                 resetForm();
+                // Remove backdrop and modal-open class
+                const modalBackdrop = document.querySelector('.modal-backdrop');
+                if (modalBackdrop) {
+                  modalBackdrop.remove();
+                }
+                document.body.classList.remove('modal-open');
                 setShowModal(false);
               }}
               aria-label="Close"
@@ -257,6 +281,7 @@ export const Modal = ({ showModal, setShowModal, selectedRecipe, fetchRecipes })
                         />
                       </div>
                     )}
+                    <label className="form-label">Cambiar imagen (solo archivos de imagen)</label>
                     <input
                       type="file"
                       className="form-control"
@@ -321,6 +346,12 @@ export const Modal = ({ showModal, setShowModal, selectedRecipe, fetchRecipes })
               <div className="modal-footer mt-4">
                 <button type="button" className="btn btn-secondary" onClick={() => {
                   resetForm();
+                  // Remove backdrop and modal-open class
+                  const modalBackdrop = document.querySelector('.modal-backdrop');
+                  if (modalBackdrop) {
+                    modalBackdrop.remove();
+                  }
+                  document.body.classList.remove('modal-open');
                   setShowModal(false);
                 }}>
                   Cancelar
