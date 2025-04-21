@@ -75,7 +75,6 @@ export const Register = ({ onSuccess }) => {
         title: "Usuario Agregado",
         text: "El usuario ha sido agregado correctamente",
       });
-      console.log("SUCCESS");
       onSuccess();
       resetForm();
     } catch (error) {

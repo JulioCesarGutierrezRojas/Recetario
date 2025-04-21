@@ -43,8 +43,7 @@ const MyRecipes = () => {
     };
 
     const handleEditRecipe = async (recipe) => {
-        console.log("Recipe data received:", recipe); // Para depuración
-
+        
         setSelectedRecipe(recipe);
         setTitle(recipe.name);
         setProcess(recipe.process);
@@ -54,7 +53,6 @@ const MyRecipes = () => {
 
         if (recipe.recipe_ingredients?.length > 0) {
             mappedIngredients = recipe.recipe_ingredients.map(item => {
-                console.log("Current ingredient item:", item); // Para depuración
                 return {
                     name: item.ingredient?.name || item.ingredient || "",
                     quantity: item.quantity || "",
@@ -64,8 +62,7 @@ const MyRecipes = () => {
         } else {
             mappedIngredients = [{ name: "", quantity: "" }];
         }
-
-        console.log("Mapped ingredients:", mappedIngredients); // Para ver el resultado
+    
         setIngredients(mappedIngredients);
         setImage(recipe.image);
     };
