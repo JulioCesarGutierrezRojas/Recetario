@@ -11,4 +11,10 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    historyApiFallback: true // <-- Necesario para React Router
+  },
+  build: {
+    outDir: 'dist'
+  }
 })
