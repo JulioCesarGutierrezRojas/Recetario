@@ -31,12 +31,23 @@ const RecipeForm = () => {
 
   const handleImageChange = (event) => {
     if (event.target.files.length > 0) {
-      setImage(event.target.files[0]); 
+      const file = event.target.files[0];
+      // Validate file is an image
+      if (!file.type.match('image.*')) {
+        showErrorToast({ 
+          title: "Error", 
+          text: "Solo se permiten archivos de imagen (jpg, png, gif, etc.)" 
+        });
+        // Reset the input
+        event.target.value = '';
+        return;
+      }
+      setImage(file); 
     } else {
       setImage(null); 
     }
   };
-  
+
 
   // Función para verificar si el ingrediente existe y crear uno nuevo si es necesario
 const createIngredientIfNeeded = async (ingredientName) => {
@@ -47,7 +58,7 @@ const createIngredientIfNeeded = async (ingredientName) => {
     );
 
     if (!foundIngredient) {
-      
+
       const newIngredient = await createIngredient(ingredientName);
       foundIngredient = newIngredient;
     }
@@ -152,8 +163,8 @@ const handleBackHome = () => {
           <textarea className="form-control" value={tips} onChange={(e) => setTips(e.target.value)} required></textarea>
         </div>
         <div className="mb-3">
-          <label className="form-label">Imagen de la Receta</label>
-          <input type="file" className="form-control" onChange={handleImageChange} required />
+          <label className="form-label">Imagen de la Receta (solo archivos de imagen)</label>
+          <input type="file" className="form-control" accept="image/*" onChange={handleImageChange} required />
         </div>
 
         <h4>Ingredientes</h4>

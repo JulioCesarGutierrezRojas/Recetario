@@ -16,7 +16,7 @@ const Recipe = () => {
     // Función para calcular la calificación promedio
     const calculateAverageRating = (reviews) => {
         if (reviews.length === 0) return 0;
-        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const totalRating = reviews.reduce((sum, review) => sum + (review.rating || review.calification || 0), 0);
         return totalRating / reviews.length;
     };
 
@@ -40,8 +40,26 @@ const Recipe = () => {
         <div className="container-fluid align-items-start pt-4 mt-5">
             <div className="row d-flex flex-row">
                 <div className="col-8">
-                    <img src={cardData.image} className="img-fluid rounded shadow-sm w-100" alt={cardData.name}
-                        style={{ height: "350px", objectFit: "cover" }} />
+                    <div className="position-relative">
+                        <img src={cardData.image} className="img-fluid rounded shadow-sm w-100" alt={cardData.name}
+                            style={{ height: "350px", objectFit: "cover" }} />
+                        <div className="position-absolute bottom-0 start-0 bg-dark bg-opacity-75 text-white p-2 rounded-end">
+                            <div className="d-flex align-items-center">
+                                <span className="me-2">Calificación:</span>
+                                <div className="progress" style={{ width: "100px", height: "15px" }}>
+                                    <div 
+                                        className="progress-bar bg-warning" 
+                                        role="progressbar" 
+                                        style={{ width: `${ratingPercentage}%` }} 
+                                        aria-valuenow={averageRating} 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="5">
+                                    </div>
+                                </div>
+                                <span className="ms-2">{averageRating.toFixed(1)}/5</span>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Sección de Ingredientes y Procedimiento */}
                     <div className="container-fluid d-flex pt-4">

@@ -26,7 +26,7 @@ def send_recovery_email(email, token, name):
                 Si no solicitaste este cambio, por favor ignora este mensaje.<br>
                 Este token expirará en 1 hora.
               </p>
-              <p style="margin-top: 2rem;">Atentamente,<br>El equipo de Recetario</p>
+              <p style="margin-top: 2rem;">Atentamente,<br>El equipo de Sabor & Punto</p>
             </div>
           </body>
         </html>

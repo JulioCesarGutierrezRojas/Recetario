@@ -28,15 +28,13 @@ const CommentSection = ({ reviews, setReviews, recipeId }) => {
     setIsSubmitting(true);
 
     try {
+      // The createComment function now returns a properly structured comment object
       const newComment = await createComment(recipeId, comment, rating);
 
-      const nuevoComentario = {
-        ...newComment,
-        rating: rating,
-        comment: comment.trim(),
-      };
+      // Add the new comment to the beginning of the reviews array
+      setReviews([newComment, ...reviews]);
 
-      setReviews([nuevoComentario, ...reviews]);
+      // Reset the form
       setComment("");
       setRating(0);
     } catch (error) {
@@ -77,20 +75,24 @@ const CommentSection = ({ reviews, setReviews, recipeId }) => {
         </button>
       </form>
 
-      <h5>Comentarios ({reviews.length}):</h5>
+      <h5>Comentarios y Calificaciones ({reviews.length}):</h5>
       {reviews.length === 0 ? (
         <p>No hay reseñas aún.</p>
       ) : (
         reviews.map((review) => (
-          <div key={review.id} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
+          <div key={review.id} style={{ 
+            borderBottom: "1px solid #ccc", 
+            padding: "10px 0",
+            backgroundColor: review.isRatingOnly ? "#f8f9fa" : "transparent"
+          }}>
             <div>
-              {review.rating
-                ? Array.from({ length: review.rating }).map((_, i) => (
+              {review.rating || review.calification
+                ? Array.from({ length: review.rating || review.calification }).map((_, i) => (
                   <FaUtensilSpoon key={i} size={20} color="#FFCC00" />
                 ))
                 : <span style={{ color: "#ccc" }}>Sin calificación</span>}
             </div>
-            <p>{review.comment || review.text || "Comentario vacío"}</p>
+            <p>{review.isRatingOnly ? "Solo calificación" : (review.comment || review.text || "Comentario vacío")}</p>
             <div style={{ fontSize: "0.85em", color: "#666" }}>
               {new Date(review.created_at).toLocaleString("es-MX", {
                 day: '2-digit',

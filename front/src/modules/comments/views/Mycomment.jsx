@@ -3,8 +3,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { getComments, getRatings, getRecipes } from "../controller/controllerMycomment";
 import { handleRequest } from '../../../config/http-client.gateway';
+import { useNavigate } from "react-router";
+import Swal from 'sweetalert2';
+import { showSuccessToast, showErrorToast } from "../../../kernel/alerts";
 
 const Mycomment = () => {
+    const navigate = useNavigate();
     const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
@@ -28,6 +32,7 @@ const Mycomment = () => {
                     comment: comment.comment || 'Sin comentario',
                     calification: rating ? rating.calification : 'Sin calificación',
                     ratingId: rating ? rating.id : null,
+                    recipeId: comment.recipe,
                 };
             });
 
@@ -47,6 +52,10 @@ const Mycomment = () => {
         }
     };
 
+    const handleBackHome = () => {
+        navigate("/home");
+    };
+
     const [editItem, setEditItem] = useState(null);
     const [newComment, setNewComment] = useState("");
     const [newCalification, setNewCalification] = useState("");
@@ -61,37 +70,98 @@ const Mycomment = () => {
     };
 
     const handleSaveEdit = async () => {
-        try {
-            await handleRequest('put', `/comments/${editItem.id}/`, { comment: newComment });
-            await handleRequest('put', `/ratings/${editItem.ratingId}/`, { calification: newCalification });
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Se actualizarán el comentario y la calificación",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, actualizar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        });
 
-            setData(prev => prev.map(item =>
-                item.id === editItem.id
-                    ? { ...item, comment: newComment, calification: newCalification }
-                    : item
-            ));
+        if (result.isConfirmed) {
+            try {
+                const userId = parseInt(localStorage.getItem('user-id'), 10);
 
-            const modal = window.bootstrap.Modal.getInstance(document.getElementById('editModal'));
-            modal.hide();
-            setEditItem(null);
-        } catch (error) {
-            console.error("Error al editar:", error);
+                await handleRequest('put', `/comments/${editItem.id}/`, { 
+                    comment: newComment,
+                    user: userId,
+                    recipe: editItem.recipeId
+                });
+
+                await handleRequest('put', `/ratings/${editItem.ratingId}/`, { 
+                    calification: newCalification,
+                    user: userId,
+                    recipe: editItem.recipeId
+                });
+
+                setData(prev => prev.map(item =>
+                    item.id === editItem.id
+                        ? { ...item, comment: newComment, calification: newCalification }
+                        : item
+                ));
+
+                const modal = window.bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                modal.hide();
+                setEditItem(null);
+
+                showSuccessToast({ 
+                    title: "Actualizado con éxito", 
+                    text: "El comentario y la calificación han sido actualizados" 
+                });
+            } catch (error) {
+                console.error("Error al editar:", error);
+                showErrorToast({ 
+                    title: "Error", 
+                    text: "No se pudo actualizar el comentario. Intente nuevamente." 
+                });
+            }
         }
     };
 
     const handleDelete = async (commentId, ratingId) => {
-        try {
-            await handleRequest('delete', `/comments/${commentId}/`);
-            await handleRequest('delete', `/ratings/${ratingId}/`);
-            setData(prev => prev.filter(item => item.id !== commentId));
-        } catch (error) {
-            console.error("Error al eliminar:", error);
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡Este comentario y su calificación serán eliminados permanentemente!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const commentResponse = await handleRequest('delete', `/comments/${commentId}/`);
+
+                // Only attempt to delete the rating if ratingId exists
+                if (ratingId) {
+                    await handleRequest('delete', `/ratings/${ratingId}/`);
+                }
+
+                setData(prev => prev.filter(item => item.id !== commentId));
+
+                showSuccessToast({ 
+                    title: "Eliminado con éxito", 
+                    text: "El comentario y su calificación han sido eliminados" 
+                });
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                showErrorToast({ 
+                    title: "Error", 
+                    text: "No se pudo eliminar el comentario. Intente nuevamente." 
+                });
+            }
         }
     };
 
     return (
         <div className="container mt-5 pt-5">
-            <h1 className="text-center fw-bold">Mis comentarios realizados</h1>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h1 className="fw-bold">Mis comentarios realizados</h1>
+                <button className="btn btn-secondary" onClick={handleBackHome}>Regresar al Menú</button>
+            </div>
             <table className="table table-hover mt-5">
                 <thead className="thead-light">
                     <tr>
@@ -109,7 +179,7 @@ const Mycomment = () => {
                             <td>{item.calification}</td>
                             <td>
                                 <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(item)}>Editar</button>
-                                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.id)}>Eliminar</button>
+                                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.id, item.ratingId)}>Eliminar</button>
                             </td>
                         </tr>
                     ))}

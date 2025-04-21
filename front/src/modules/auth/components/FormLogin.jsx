@@ -43,7 +43,7 @@ const LoginForm = () => {
             await signIn(email, password);
 
             const role = localStorage.getItem('role');
-            role === 'Administrador' ? navigate('/users') : navigate('/home');
+            role === 'Administrador' ? navigate('/home') : navigate('/home');
         } catch (e) {
             showWarningToast({ title: 'Error', text: e.message });
         } finally {
@@ -61,15 +61,15 @@ const LoginForm = () => {
             <div className={styles.leftPanel}>
                 <div className={styles.logoContainer}>
                     <div className={styles.logoWrapper}>
-                        <img src={logo} className={styles.logo} alt="Logo Recetario" />
+                        <img src={logo} className={styles.logo} alt="Logo Sabor & Punto" />
                     </div>
-                    <h1 className={styles.appName}>Recetario</h1>
+                    <h1 className={styles.appName}>Sabor & Punto</h1>
                 </div>
             </div>
 
             <div className={styles.rightPanel}>
                 <form className={styles.form} onSubmit={handleSubmit}>
-                    <h2 className={styles.title}>Bienvenido a Recetario</h2>
+                    <h2 className={styles.title}>Bienvenido a Sabor & Punto</h2>
                     <p className={styles.subtitle}>Ingresa a tu cuenta</p>
 
                     <div className={styles.formGroup}>

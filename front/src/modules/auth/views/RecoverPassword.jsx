@@ -25,7 +25,7 @@ const PasswordResetScreen = () => {
                         fontWeight: '700',
                         marginBottom: '1rem',
                         color: 'var(--secondary)'
-                    }}>Recetario</h1>
+                    }}>Sabor & Punto</h1>
                     <p style={{fontSize: '1.2rem'}}>Tu libro de recetas digital</p>
                 </div>
             </div>

@@ -44,14 +44,14 @@ const MyRecipes = () => {
 
     const handleEditRecipe = async (recipe) => {
         console.log("Recipe data received:", recipe); // Para depuración
-        
+
         setSelectedRecipe(recipe);
         setTitle(recipe.name);
         setProcess(recipe.process);
         setTips(recipe.serving_council);
-    
+
         let mappedIngredients = [];
-    
+
         if (recipe.recipe_ingredients?.length > 0) {
             mappedIngredients = recipe.recipe_ingredients.map(item => {
                 console.log("Current ingredient item:", item); // Para depuración
@@ -64,12 +64,12 @@ const MyRecipes = () => {
         } else {
             mappedIngredients = [{ name: "", quantity: "" }];
         }
-    
+
         console.log("Mapped ingredients:", mappedIngredients); // Para ver el resultado
         setIngredients(mappedIngredients);
         setImage(recipe.image);
     };
-    
+
     const handleIngredientChange = (index, event) => {
         const newIngredients = [...ingredients];
         newIngredients[index][event.target.name] = event.target.value;
@@ -126,18 +126,18 @@ const MyRecipes = () => {
             validateNoExcessiveRepetition(process, "Proceso"),
             validateNonEmpty(tips, "Consejos para Servir"),
             validateNoExcessiveRepetition(tips, "Consejos para Servir")
-        ].filter(Boolean); 
-        
+        ].filter(Boolean);
+
         if (errors.length > 0) {
             showErrorToast({
                 title: "Validación",
                 text: errors.join("\n")
             });
-            return; 
+            return;
         }
 
         if (!selectedRecipe) return;
-    
+
         const result = await Swal.fire({
             title: '¿Estás seguro?',
             text: "Se actualizarán los datos de la receta.",
@@ -147,13 +147,13 @@ const MyRecipes = () => {
             cancelButtonText: 'Cancelar',
             reverseButtons: true
         });
-    
+
         if (result.isConfirmed) {
             try {
                 // Determinar si la imagen cambió
-                const imageChanged = image !== selectedRecipe.image && 
-                                   !(typeof image === 'string' && image === selectedRecipe.image);
-    
+                const imageChanged = image !== selectedRecipe.image &&
+                    !(typeof image === 'string' && image === selectedRecipe.image);
+
                 // Preparar los datos según si hay imagen nueva o no
                 let dataToSend;
                 const payload = {
@@ -167,8 +167,8 @@ const MyRecipes = () => {
                             quantity: parseFloat(ing.quantity) || 0
                         }))
                 };
-    
-                
+
+
                 if (imageChanged && image instanceof File) {
                     const formData = new FormData();
                     Object.entries(payload).forEach(([key, value]) => {
@@ -180,29 +180,29 @@ const MyRecipes = () => {
                     });
                     formData.append('image', image);
                     dataToSend = formData;
-                } 
-    
+                }
+
                 else {
                     dataToSend = {
                         ...payload,
-                        image: imageChanged ? image : null 
+                        image: imageChanged ? image : null
                     };
                 }
-    
-               
-    
+
+
+
                 const response = await updateRecipe(selectedRecipe.id, dataToSend);
-    
+
                 if (!response || response.error) {
                     throw new Error(response?.error || "Error al actualizar la receta");
                 }
-    
+
                 showSuccessToast({ title: "Receta actualizada", text: "¡Éxito!" });
-    
+
                 // Actualizar lista y cerrar modal
                 const freshRecipes = await getRecipes();
                 setRecipes(freshRecipes);
-                
+
                 const modal = document.getElementById('editRecipeModal');
                 if (modal) {
                     modal.style.display = 'none';
@@ -210,13 +210,14 @@ const MyRecipes = () => {
                     const backdrop = document.querySelector('.modal-backdrop');
                     if (backdrop) backdrop.remove();
                 }
-    
+
+                window.location.reload();
             } catch (error) {
                 console.error("Error completo:", error.response?.data || error);
                 showErrorToast({
                     title: "Error",
-                    text: error.response?.data?.message || 
-                         "Error al actualizar la receta. Verifica los datos."
+                    text: error.response?.data?.message ||
+                        "Error al actualizar la receta. Verifica los datos."
                 });
             }
         }

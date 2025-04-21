@@ -6,10 +6,11 @@ export const signIn = async (email, password) => {
     if (response.type !== 'SUCCESS')
         throw new Error(response.text);
 
-    const {token, role, user} = response.result;
+    const {token, role, user, id} = response.result;
     localStorage.setItem('token', token);
     localStorage.setItem('role', role);
     localStorage.setItem('user', user);
+    localStorage.setItem('user-id', id);
     return true;
 }
 

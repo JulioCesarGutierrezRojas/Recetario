@@ -9,13 +9,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_param = self.request.query_params.get('user')
+        recipe_param = self.request.query_params.get('recipe')
+
+        queryset = self.queryset
 
         if user_param == 'me':
-            return self.queryset.filter(user=self.request.user)
+            queryset = queryset.filter(user=self.request.user)
+        elif user_param:
+            queryset = queryset.filter(user_id=user_param)
 
-        if user_param:
-            return self.queryset.filter(user_id=user_param)
+        if recipe_param:
+            queryset = queryset.filter(recipe_id=recipe_param)
 
-        return self.queryset.all()
+        return queryset
 
 # Create your views here.
